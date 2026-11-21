@@ -5,6 +5,7 @@ Web app (PWA) que importa NFC-e, guarda preços e compara com a próxima compra,
 ## Regras do projeto
 - **Custo zero por padrão.** Recursos pagos (OCR avançado, consulta avançada de nota) são opcionais, com aviso de custo uma única vez, aceite explícito e cancelamento em Configurações. Cobrança por **créditos pré-pagos**.
 - **Nunca armazenar CPF ou nome do consumidor.** Nem em banco, logs de erro ou arquivos de teste.
+- **Não contornar captcha nem bloqueio de IP** (sem proxies, sem trocar de IP, sem desligar verificação de certificado). O RJ bloqueia o IP do Supabase: ver `docs/RJ-ACESSO.md`.
 - **Não contornar captcha.** Se a leitura direta da SEFAZ não funcionar, usar as alternativas (XML/PDF, texto colado, manual, consulta paga opcional).
 - **Vínculo de produto pelo GTIN (cEAN)**, não pelo código interno da loja. "SEM GTIN" vincula por descrição com confirmação do usuário.
 - **Validação no servidor** (funções do Supabase) para consentimento, saldo e limites antes de qualquer chamada paga.
@@ -26,5 +27,5 @@ Ver `docs/SKILLS.md`.
 - `tests/fixtures/nfce-rj/` páginas de exemplo **sem CPF e sem nome**
 - `docs/` escopo, design, skills, próximos passos
 
-## Primeiro passo de implementação
-Verificação do RJ com cupom real: o link do QR abre sem captcha? A página de resultado é legível? Isso decide entre leitura direta gratuita e alternativas.
+## Leitura da NFC-e do RJ
+A leitura direta pelo servidor foi bloqueada. Caminho gratuito: QR/chave, consulta oficial aberta no navegador do usuário, texto copiado ou PDF de volta ao app. Ver `docs/RJ-ACESSO.md`.
