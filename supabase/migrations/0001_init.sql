@@ -111,6 +111,7 @@ create table public.price_reports (
   unique (observation_id, reporter_id)
 );
 create index price_reports_obs_idx on public.price_reports (observation_id);
+create index price_reports_reporter_idx on public.price_reports (reporter_id);
 
 -- ---------- Recursos pagos opcionais: consentimento, preços, créditos ----------
 create type public.paid_feature as enum ('ocr_advanced', 'nfce_paid_lookup');
@@ -218,10 +219,19 @@ create policy ledger_read on public.credit_ledger for select to authenticated
 -- reader_health: sem política para usuários; acesso só pelo service role
 
 -- ---------- Preços colaborativos (sem dados pessoais) ----------
-create view public.shared_prices with (security_invoker = false) as
+-- Função em vez de view: devolve só colunas não pessoais (sem user_id) de preços compartilhados e não escondidos.
+create function public.get_shared_prices(p_product_id bigint)
+returns table (
+  product_id bigint, store_id bigint, price_cents integer,
+  source public.price_source, is_promo boolean, observed_at timestamptz, confirmations integer
+)
+language sql stable security definer set search_path = ''
+as $$
   select o.product_id, o.store_id, o.price_cents, o.source, o.is_promo, o.observed_at, o.confirmations
   from public.price_observations o
-  where o.shared and not o.hidden;
-
-revoke all on public.shared_prices from anon;
-grant select on public.shared_prices to authenticated;
+  where o.product_id = p_product_id and o.shared and not o.hidden
+  order by o.observed_at desc
+  limit 200
+$$;
+revoke execute on function public.get_shared_prices(bigint) from public, anon;
+grant execute on function public.get_shared_prices(bigint) to authenticated;
