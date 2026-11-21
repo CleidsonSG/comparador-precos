@@ -1,0 +1,30 @@
+# CLAUDE.md — Comparador de Preços de Supermercado
+
+Web app (PWA) que importa NFC-e, guarda preços e compara com a próxima compra, inclusive entre mercados. Grupo de teste inicial: Rio de Janeiro (RJ).
+
+## Regras do projeto
+- **Custo zero por padrão.** Recursos pagos (OCR avançado, consulta avançada de nota) são opcionais, com aviso de custo uma única vez, aceite explícito e cancelamento em Configurações. Cobrança por **créditos pré-pagos**.
+- **Nunca armazenar CPF ou nome do consumidor.** Nem em banco, logs de erro ou arquivos de teste.
+- **Não contornar captcha.** Se a leitura direta da SEFAZ não funcionar, usar as alternativas (XML/PDF, texto colado, manual, consulta paga opcional).
+- **Vínculo de produto pelo GTIN (cEAN)**, não pelo código interno da loja. "SEM GTIN" vincula por descrição com confirmação do usuário.
+- **Validação no servidor** (funções do Supabase) para consentimento, saldo e limites antes de qualquer chamada paga.
+- **Sem automações que alterem produção sozinhas.** Reparo do leitor: o agente propõe, o humano aprova.
+- Publicação nas lojas (Play Store/App Store) está **fora do escopo** até o usuário pedir.
+
+## Visual e frontend
+Mobile-first, responsivo (360 a 1440 px), interativo, com estados de carregando/vazio/erro/sem internet, acessibilidade e modo escuro. Antes de entregar uma tela, conferir visualmente em celular e computador. Ver `docs/DESIGN.md`.
+
+## Skills recomendadas
+Ver `docs/SKILLS.md`.
+
+## Estrutura
+- `site/` protótipo visual (HTML único)
+- `supabase/migrations/` esquema do banco com RLS
+- `supabase/functions/` leitor NFC-e por UF, OCR avançado, créditos
+- `src/modules/nfce/uf/` um módulo por estado (RJ primeiro)
+- `src/modules/ocr/`, `src/modules/prices/`
+- `tests/fixtures/nfce-rj/` páginas de exemplo **sem CPF e sem nome**
+- `docs/` escopo, design, skills, próximos passos
+
+## Primeiro passo de implementação
+Verificação do RJ com cupom real: o link do QR abre sem captcha? A página de resultado é legível? Isso decide entre leitura direta gratuita e alternativas.
