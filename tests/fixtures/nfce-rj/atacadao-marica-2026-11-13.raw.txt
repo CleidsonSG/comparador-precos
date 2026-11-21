@@ -1,0 +1,230 @@
+ATACADAO S.A.
+CNPJ: 75.315.333/0319-26
+ROD ERNANI DO AMARAL PEIXOTO S/N , 1 , , FLAMENGO , MARICA , RJ
+JERKED BEEF DT (Código: 84331 )
+Qtde.:1 UN: UND9 Vl. Unit.: 54,9
+Vl. Total
+54,90
+BACON DEF.PAMPLONA (Código: 3985 )
+Qtde.:1,42 UN: KG9 Vl. Unit.: 39,98
+Vl. Total
+56,77
+ARROZ OURO B.AGUL. (Código: 69203 )
+Qtde.:1 UN: UND9 Vl. Unit.: 20,5
+Vl. Total
+20,50
+HF.MANDIOQUINHA BDJ (Código: 5370 )
+Qtde.:2 UN: PCT9 Vl. Unit.: 2,5
+Vl. Total
+5,00
+CAFE MELITTA (Código: 49829 )
+Qtde.:1 UN: UND9 Vl. Unit.: 22,9
+Vl. Total
+22,90
+CAFE BOM DIA TRAD. (Código: 19125 )
+Qtde.:1 UN: UND9 Vl. Unit.: 14,9
+Vl. Total
+14,90
+ALHO Kg A GRANEL (Código: 21933 )
+Qtde.:1,21 UN: KG9 Vl. Unit.: 19,9
+Vl. Total
+24,08
+BATATA DOCE (Código: 1908 )
+Qtde.:0,925 UN: KG9 Vl. Unit.: 5,99
+Vl. Total
+5,54
+CEBOLA ATACADAO (Código: 14692 )
+Qtde.:0,35 UN: KG9 Vl. Unit.: 12,99
+Vl. Total
+4,55
+FEIJAO S.MAXIMO PTO (Código: 25435 )
+Qtde.:1 UN: PCT9 Vl. Unit.: 7,85
+Vl. Total
+7,85
+FEIJAO COMBRASIL (Código: 69657 )
+Qtde.:2 UN: UND9 Vl. Unit.: 9,9
+Vl. Total
+19,80
+MAC.GALO ESPAG.SEM.8 (Código: 75307 )
+Qtde.:2 UN: UND9 Vl. Unit.: 4,95
+Vl. Total
+9,90
+ESC.DENTAL ORAL-B (Código: 92043 )
+Qtde.:1 UN: UND9 Vl. Unit.: 18,9
+Vl. Total
+18,90
+MAC.GALO SEM.P
+.NOSSO (Código: 46242 )
+Qtde.:2 UN: UND9 Vl. Unit.: 4,69
+Vl. Total
+9,38
+SARDINHA 88 TOMATE (Código: 35328 )
+Qtde.:4 UN: UND9 Vl. Unit.: 5,29
+Vl. Total
+21,16
+BATATA PRE FRITA (Código: 60137 )
+Qtde.:1 UN: PCT8 Vl. Unit.: 36,9
+Vl. Total
+36,90
+BISC.VITARELLA (Código: 77569 )
+Qtde.:2 UN: UND9 Vl. Unit.: 4,99
+Vl. Total
+9,98
+FLOCAO GRANFINO (Código: 57607 )
+Qtde.:2 UN: UND9 Vl. Unit.: 3,49
+Vl. Total
+6,98
+BISC.MABEL ROSQ. (Código: 90096 )
+Qtde.:2 UN: UND9 Vl. Unit.: 3,49
+Vl. Total
+6,98
+BISC.MABEL ROSQ. (Código: 90089 )
+Qtde.:1 UN: UND9 Vl. Unit.: 3,49
+Vl. Total
+3,49
+SALG ELMA CHIPS (Código: 89010 )
+Qtde.:2 UN: UND9 Vl. Unit.: 11,99
+Vl. Total
+23,98
+AVEIA NESTLE F.FINOS (Código: 82559 )
+Qtde.:3 UN: UND9 Vl. Unit.: 3,48
+Vl. Total
+10,44
+REQ.CATUPIRY TRAD. (Código: 12492 )
+Qtde.:1 UN: UND9 Vl. Unit.: 17,99
+Vl. Total
+17,99
+CANJIQUINHA GRANFINO (Código: 61965 )
+Qtde.:1 UN: UND9 Vl. Unit.: 2,75
+Vl. Total
+2,75
+MAC.NISSIN LAMEN (Código: 5614 )
+Qtde.:2 UN: PCT9 Vl. Unit.: 2,69
+Vl. Total
+5,38
+MAC.INST.MARUCHAN (Código: 63890 )
+Qtde.:6 UN: UND9 Vl. Unit.: 0,99
+Vl. Total
+5,94
+BISC.NEST.PASS.LEITE (Código: 25728 )
+Qtde.:1 UN: UND9 Vl. Unit.: 3,49
+Vl. Total
+3,49
+EXTRATO ELEFANTE (Código: 83715 )
+Qtde.:4 UN: PTE9 Vl. Unit.: 6,89
+Vl. Total
+27,56
+DES.REXONA AERO (Código: 65703 )
+Qtde.:1 UN: UND9 Vl. Unit.: 12,9
+Vl. Total
+12,90
+DES.ABOVE AERO (Código: 18038 )
+Qtde.:2 UN: UND9 Vl. Unit.: 7,79
+Vl. Total
+15,58
+FILTRO.CAFE BRIGITTA (Código: 39425 )
+Qtde.:1 UN: UND9 Vl. Unit.: 3,99
+Vl. Total
+3,99
+LEITE L. VIDA NINHO (Código: 14191 )
+Qtde.:2 UN: UND7 Vl. Unit.: 5,49
+Vl. Total
+10,98
+ABS.INTIMUS C/A LP- (Código: 67289 )
+Qtde.:1 UN: UND9 Vl. Unit.: 24,5
+Vl. Total
+24,50
+ALCOOL MONTENEGRO (Código: 76425 )
+Qtde.:1 UN: UND9 Vl. Unit.: 8,9
+Vl. Total
+8,90
+DET.LIQ.YPE (Código: 22392 )
+Qtde.:6 UN: UND9 Vl. Unit.: 2,55
+Vl. Total
+15,30
+MAION.HEINZ BISNAGA (Código: 52605 )
+Qtde.:1 UN: UND9 Vl. Unit.: 9,69
+Vl. Total
+9,69
+BISC.POLVILHO BULNEZ (Código: 13833 )
+Qtde.:1 UN: UND9 Vl. Unit.: 3,89
+Vl. Total
+3,89
+BATATA PALHA (Código: 14914 )
+Qtde.:1 UN: UND9 Vl. Unit.: 17,5
+Vl. Total
+17,50
+AGUA SANIT.CLORAL (Código: 57387 )
+Qtde.:1 UN: UND9 Vl. Unit.: 10,99
+Vl. Total
+10,99
+PAPEL HIG.PERSONAL (Código: 76907 )
+Qtde.:1 UN: UND9 Vl. Unit.: 28,96
+Vl. Total
+28,96
+FRALDA T.MONICA (Código: 13929 )
+Qtde.:1 UN: UND9 Vl. Unit.: 51,98
+Vl. Total
+51,98
+Data/Hora da Consulta: 20/11/2026 23:37:20
+49
+914,64
+10,95
+903,69
+Valor pago R$:
+903,69
+268,14
+BISC.WAFER BIS (Código: 86192 )
+Qtde.:1 UN: UND9 Vl. Unit.: 7,49
+Vl. Total
+7,49
+PILHA RAYOVAC (Código: 79313 )
+Qtde.:1 UN: UND9 Vl. Unit.: 41,29
+Vl. Total
+41,29
+SAB.PROTEX (Código: 61018 )
+Qtde.:12 UN: UND9 Vl. Unit.: 3,39
+Vl. Total
+40,68
+AZEITE GALLO VDO (Código: 7081 )
+Qtde.:1 UN: VDO9 Vl. Unit.: 27,9
+Vl. Total
+27,90
+LEITE PO NINHO INT. (Código: 95627 )
+Qtde.:2 UN: UND9 Vl. Unit.: 47,9
+Vl. Total
+95,80
+CAFE MELITTA CAPPUCI (Código: 57697 )
+Qtde.:1 UN: UND9 Vl. Unit.: 16,39
+Vl. Total
+16,39
+BISC.STA EDWIGES (Código: 54954 )
+Qtde.:1 UN: UND9 Vl. Unit.: 1,99
+Vl. Total
+1,99
+BISC.CAPRICCHE (Código: 60824 )
+Qtde.:5 UN: UND9 Vl. Unit.: 1,99
+Vl. Total
+9,95
+Qtd. total de itens:
+Valor total R$:
+Descontos R$:
+Valor a pagar R$:
+Forma de pagamento:
+Vale Alimentação
+Informação dos Tributos Totais Incidentes (Lei Federal 12.741/2012) R$
+Informações gerais da Nota
+EMISSÃO NORMAL
+Número: 131002 Série: 506 Emissão: 13/11/2026 19:08:16-03:00 - Via Consumidor 2
+Protocolo de Autorização: 233262718100742 13/11/2026 às 19:08:26-03:00
+Ambiente de Produção - Versão XML: 4.00 - Versão XSLT: 2.07
+Chave de acesso
+Consulte pela Chave de Acesso em https://www.fazenda.rj.gov.br/nfce/consulta
+Chave de acesso:
+3326 1175 3153 3303 1926 6550 6000 1310 0210 4857 9170
+Consumidor
+CPF: [removido]
+Nome: [removido]
+Informações de interesse do contribuinte
+PDV : 6 - TRANSACAO : 66405
+

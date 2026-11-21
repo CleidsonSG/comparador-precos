@@ -1,10 +1,10 @@
 # Próximos passos
 
-1. **Verificação do RJ com cupom real** (primeira tarefa de código)
+1. **Verificação do RJ com cupom real** (feita parcialmente em 2026-11-20: a consulta por chave abriu sem captcha no navegador do usuário; a página mostra o CÓDIGO INTERNO do mercado, não o GTIN. Falta testar o acesso a partir do Supabase, que pode ser bloqueado por IP, e descobrir o que significa o dígito colado à unidade, ex.: UND9, UND7, PCT8)
    - Entrada: texto do link do QR (`...consultaNFCe/QRCode?p=...`) ou a chave de 44 dígitos. Cubra CPF e nome.
    - Perguntas: abre sem captcha? A página de resultado traz itens, GTIN, valores, CNPJ e data? Há botão de XML?
    - Resultado define o cenário: A (leitura direta grátis), B (captcha só na chave) ou C (alternativas e consulta paga opcional).
-2. Módulo `src/modules/nfce/uf/rj` com leitura por âncoras, validação (soma = total, chave, CNPJ, data) e fixtures sem dados pessoais.
+2. (Feito para texto/PDF: `src/modules/nfce/uf/rj/parseConsultaText.ts`, 6 testes. Falta o leitor por HTML/consulta direta.) Módulo `src/modules/nfce/uf/rj` com leitura por âncoras, validação (soma = total, chave, CNPJ, data) e fixtures sem dados pessoais.
 3. Autenticação, perfil e importação de notas (QR, chave, XML/PDF, texto colado, manual).
 4. Leitura ao vivo do produto (GTIN) com cartão de comparação e veredito.
 5. KPIs e gráficos, alertas e carrinho inteligente.
