@@ -6,8 +6,8 @@ Web app (PWA) que importa NFC-e, guarda preços e compara com a próxima compra,
 - **Custo zero por padrão.** Recursos pagos (OCR avançado, consulta avançada de nota) são opcionais, com aviso de custo uma única vez, aceite explícito e cancelamento em Configurações. Cobrança por **créditos pré-pagos**.
 - **Nunca armazenar CPF ou nome do consumidor.** Nem em banco, logs de erro ou arquivos de teste.
 - **Não contornar captcha nem bloqueio de IP** (sem proxies, sem trocar de IP, sem desligar verificação de certificado). O RJ bloqueia o IP do Supabase: ver `docs/RJ-ACESSO.md`.
-- **Não contornar captcha.** Se a leitura direta da SEFAZ não funcionar, usar as alternativas (XML/PDF, texto colado, manual, consulta paga opcional).
-- **Vínculo de produto pelo GTIN (cEAN)**, não pelo código interno da loja. "SEM GTIN" vincula por descrição com confirmação do usuário.
+- Se a leitura direta da SEFAZ não funcionar, usar as alternativas (XML/PDF, texto colado, manual, consulta paga opcional).
+- **Vínculo de produto por mercado (CNPJ) + código interno da nota.** O GTIN é opcional; vínculo assistido entre código de barras e item, sempre com confirmação do usuário.
 - **Validação no servidor** (funções do Supabase) para consentimento, saldo e limites antes de qualquer chamada paga.
 - **Sem automações que alterem produção sozinhas.** Reparo do leitor: o agente propõe, o humano aprova.
 - Publicação nas lojas (Play Store/App Store) está **fora do escopo** até o usuário pedir.
