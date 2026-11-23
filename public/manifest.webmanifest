@@ -1,1 +1,1 @@
-{"name":"Gôndola","short_name":"Gôndola","lang":"pt-BR","start_url":"/","display":"standalone","background_color":"#0e141b","theme_color":"#ffc93c","icons":[{"src":"favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}
+{"name":"Gôndola","short_name":"Gôndola","lang":"pt-BR","start_url":".","scope":".","display":"standalone","background_color":"#0e141b","theme_color":"#ffc93c","icons":[{"src":"favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}

@@ -9,7 +9,7 @@ export const supabase: SupabaseClient | null =
   url && key ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
 
 /** Para onde o link do e-mail leva de volta (precisa estar em Authentication > URL Configuration). */
-export const authRedirectUrl = (): string => `${location.origin}/`;
+export const authRedirectUrl = (): string => `${location.origin}${import.meta.env.BASE_URL}`;
 
 /** O link do e-mail vencido ou já usado volta com o erro no endereço. */
 export function authErrorFromUrl(): string | null {
