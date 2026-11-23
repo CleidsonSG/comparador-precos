@@ -1,48 +1,18 @@
-import { useEffect, useRef, useState } from "react";
-import { BrowserMultiFormatReader, type IScannerControls } from "@zxing/browser";
+import { BrowserMultiFormatReader } from "@zxing/browser";
+import { useCameraReader } from "./useCameraReader.ts";
 
 /** Lê código de barras (EAN/UPC) pela câmera ou por foto. Tudo roda no aparelho. */
 export default function BarcodeScanner({ onCode }: { onCode: (code: string) => void }) {
-  const video = useRef<HTMLVideoElement>(null);
-  const controls = useRef<IScannerControls | null>(null);
-  const [on, setOn] = useState(false);
-  const [err, setErr] = useState("");
-
-  const stop = () => {
-    controls.current?.stop();
-    controls.current = null;
-    setOn(false);
-  };
-  useEffect(() => () => controls.current?.stop(), []);
-
-  const start = async () => {
-    setErr("");
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setErr("Este navegador não permite usar a câmera aqui. Envie uma foto do código ou digite os números.");
-      return;
-    }
-    setOn(true);
-    try {
-      controls.current = await new BrowserMultiFormatReader().decodeFromVideoDevice(undefined, video.current ?? undefined, (res) => {
-        if (res) {
-          stop();
-          onCode(res.getText());
-        }
-      });
-    } catch {
-      setOn(false);
-      setErr("Não consegui abrir a câmera. Permita o acesso nas configurações do navegador, ou envie uma foto.");
-    }
-  };
+  const cam = useCameraReader(() => new BrowserMultiFormatReader(), onCode);
 
   const fromPhoto = async (f: File | undefined) => {
     if (!f) return;
-    setErr("");
+    cam.setErr("");
     const url = URL.createObjectURL(f);
     try {
       onCode((await new BrowserMultiFormatReader().decodeFromImageUrl(url)).getText());
     } catch {
-      setErr("Não encontrei um código de barras nessa foto. Aproxime, deixe o código reto e bem iluminado.");
+      cam.setErr("Não encontrei um código de barras nessa foto. Aproxime, deixe o código reto e bem iluminado.");
     } finally {
       URL.revokeObjectURL(url);
     }
@@ -50,21 +20,21 @@ export default function BarcodeScanner({ onCode }: { onCode: (code: string) => v
 
   return (
     <div>
-      <div className={`scanner${on ? " live" : ""}`}>
-        {on && <video ref={video} muted playsInline aria-label="Imagem da câmera para ler o código de barras" />}
+      <div className={`scanner${cam.on ? " live" : ""}`}>
+        {cam.on && <video ref={cam.video} muted playsInline autoPlay aria-label="Imagem da câmera para ler o código de barras" />}
         <span className="corner c1" aria-hidden="true" /><span className="corner c2" aria-hidden="true" />
         <span className="corner c3" aria-hidden="true" /><span className="corner c4" aria-hidden="true" />
-        {on && <span className="line" aria-hidden="true" />}
-        {!on && <p>Aponte a câmera para o código de barras do produto</p>}
+        {cam.on && <span className="line" aria-hidden="true" />}
+        {!cam.on && <p>Aponte a câmera para o código de barras do produto</p>}
       </div>
       <div className="row" style={{ marginTop: 12 }}>
-        {on ? <button className="btn" onClick={stop}>Fechar câmera</button> : <button className="btn tag" onClick={start}>Abrir câmera</button>}
+        {cam.on ? <button className="btn" onClick={cam.stop}>Fechar câmera</button> : <button className="btn tag" onClick={cam.start}>Abrir câmera</button>}
         <label className="btn">
           Enviar foto
           <input type="file" accept="image/*" className="sr" onChange={(e) => { void fromPhoto(e.target.files?.[0]); e.target.value = ""; }} />
         </label>
       </div>
-      {err && <div className="msg bad" role="alert">{err}</div>}
+      {cam.err && <div className="msg bad" role="alert">{cam.err}</div>}
     </div>
   );
 }
