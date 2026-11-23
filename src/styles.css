@@ -95,6 +95,72 @@ td.r,th.r{text-align:right}
 @media(min-width:900px){.toast{bottom:28px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .btn.off,.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+
+/* Conta e sincronização */
+a.iconbtn{color:inherit;text-decoration:none}
+.iconbtn.sync{position:relative}
+.iconbtn.sync[aria-current="page"]{background:var(--soft)}
+/* ponto de sincronização: o rótulo do botão diz o estado; o ponto é só reforço */
+.iconbtn.sync.idle:after,.iconbtn.sync.pending:after,.iconbtn.sync.offline:after,.iconbtn.sync.error:after{content:"";position:absolute;right:6px;top:6px;width:9px;height:9px;border-radius:50%;border:2px solid var(--surface)}
+.iconbtn.sync.idle:after{background:var(--good)}
+.iconbtn.sync.pending:after,.iconbtn.sync.offline:after{background:var(--warn)}
+.iconbtn.sync.error:after{background:var(--bad)}
+
+/* navegação: contador do carrinho */
+.nav{position:relative}
+.nav .dot{position:absolute;top:4px;right:calc(50% - 22px);min-width:18px;height:18px;border-radius:9px;background:var(--tag);color:var(--tag-ink);font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 5px}
+@media(min-width:900px){.side .nav .dot{position:static;margin-left:auto}}
+
+/* Início */
+.lead{margin:-6px 0 12px}
+.grid{margin-bottom:14px}
+.grid>.card{margin-bottom:0}
+.kpi .sub{margin:0}
+.delta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--soft);color:var(--ink2)}
+.delta.good{background:var(--good-bg);color:var(--good)} .delta.bad{background:var(--bad-bg);color:var(--bad)}
+.hdr{align-items:flex-start}
+.hdr>div{flex:1 1 240px}
+.hdr>.btn{flex:none}
+.field.inline{grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin:8px 0}
+.readout{background:var(--soft);border-radius:10px;padding:6px 10px;margin:6px 0}
+.bars{display:grid;gap:14px;margin-top:10px}
+.barrow .lab{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.barrow .bar{height:14px;border-radius:4px}
+.empty svg{color:var(--ink2);margin-bottom:6px}
+
+/* Escanear: visor da câmera */
+.scanner{position:relative;aspect-ratio:4/3;max-height:300px;width:100%;border-radius:18px;background:#0b1118;overflow:hidden;display:grid;place-items:center;color:#c9d3e0}
+.scanner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scanner .corner{position:absolute;width:38px;height:38px;border:4px solid var(--tag);z-index:1}
+.scanner .c1{left:14%;top:16%;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.scanner .c2{right:14%;top:16%;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.scanner .c3{left:14%;bottom:16%;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.scanner .c4{right:14%;bottom:16%;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.scanner .line{position:absolute;left:16%;right:16%;height:2px;background:var(--tag);box-shadow:0 0 12px var(--tag);animation:scan 2.2s ease-in-out infinite;z-index:1}
+@keyframes scan{0%,100%{top:22%}50%{top:76%}}
+.scanner p{margin:0;font-size:14px;text-align:center;padding:0 24px;z-index:1}
+
+/* Notas: opções de importação e lista */
+.opts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:12px}
+.opt{display:grid;gap:6px;text-align:left;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);text-decoration:none}
+.opt:hover{background:var(--soft)}
+.opt b{font-size:15px}
+.noteitem{padding:12px 0;border-bottom:1px solid var(--line)}
+.noteitem:last-child{border:0}
+.noteitem .it{padding:0 0 8px;border:0}
+.noteitem .right{display:grid;justify-items:end;gap:4px;text-align:right}
+.noteopen{margin-top:10px}
+
+/* Configurações */
+.cols2{grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.cols2{grid-template-columns:1fr 1fr}}
+.set{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)}
+.set:last-child{border:0}
+.set .btn{flex:none}
+select.inline-select{min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 10px;flex:none}
+ul.plain{padding-left:18px;margin:6px 0 0;display:grid;gap:6px}
+.skel{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));background-size:200% 100%;animation:sh 1.2s linear infinite;border-radius:10px}
+@keyframes sh{to{background-position:-200% 0}}
 .list .it .btn,.list .it .pill{justify-self:start}
 .list .it > div:nth-child(2){grid-column:2;grid-row:1}
 

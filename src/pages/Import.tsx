@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import QrScanner from "../components/QrScanner.tsx";
 import Review from "../components/Review.tsx";
 import { describeKey, extractAccessKey, formatKey, isValidAccessKey, officialConsultaUrl } from "../lib/accessKey.ts";
@@ -14,6 +14,11 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [result, setResult] = useState<RjParseResult | null>(null);
+
+  // vindo de "Digitar a chave de acesso" (Notas): já posiciona no campo
+  useEffect(() => {
+    if (location.hash.endsWith("?chave")) document.getElementById("chave")?.focus();
+  }, []);
 
   const reset = () => { setResult(null); setErr(""); setText(""); };
 

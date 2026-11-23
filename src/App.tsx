@@ -1,36 +1,60 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import Home from "./pages/Home.tsx";
 import Notes from "./pages/Notes.tsx";
 import Import from "./pages/Import.tsx";
 import Scan from "./pages/Scan.tsx";
 import Cart from "./pages/Cart.tsx";
+import Settings from "./pages/Settings.tsx";
+import { IconCart, IconDoc, IconGear, IconHome, IconMoon, IconScan } from "./components/Icons.tsx";
+import { getStatus, startAutoSync, subscribe, type SyncStatus } from "./lib/sync.ts";
+import { toggleTheme } from "./lib/theme.ts";
+import { loadCart } from "./lib/cart.ts";
 
-type View = "inicio" | "escanear" | "carrinho" | "importar" | "notas";
+type View = "inicio" | "escanear" | "carrinho" | "importar" | "notas" | "ajustes";
 type Nav = "inicio" | "escanear" | "carrinho" | "notas";
-const TITLES: Record<View, string> = { inicio: "Início", escanear: "Escanear produto", carrinho: "Carrinho", importar: "Importar nota", notas: "Notas fiscais" };
+const TITLES: Record<View, string> = { inicio: "Início", escanear: "Escanear produto", carrinho: "Carrinho", importar: "Importar nota", notas: "Notas fiscais", ajustes: "Configurações" };
 const LABELS: Record<Nav, string> = { inicio: "Início", escanear: "Escanear", carrinho: "Carrinho", notas: "Notas" };
-
-const icons = {
-  inicio: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /></svg>,
-  carrinho: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="20" r="1.5" /><circle cx="18" cy="20" r="1.5" /><path d="M2 3h3l2.5 12h11L21 7H6" /></svg>,
-  escanear: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3" /><path d="M7 12h10" /></svg>,
-  notas: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6M9 13h8M9 17h8" /></svg>,
-};
+const ICONS: Record<Nav, ComponentType> ={ inicio: IconHome, escanear: IconScan, carrinho: IconCart, notas: IconDoc };
 
 function currentView(): View {
-  const h = location.hash.slice(1);
-  return h === "escanear" || h === "carrinho" || h === "importar" || h === "notas" ? h : "inicio";
+  const h = location.hash.slice(1).split("?")[0];
+  if (h === "conta") return "ajustes"; // endereço antigo da conta
+  return h === "escanear" || h === "carrinho" || h === "importar" || h === "notas" || h === "ajustes" ? h : "inicio";
 }
+
+const settingsLabel = (s: SyncStatus): string =>
+  s.state === "off" ? "Configurações" : s.state === "offline" ? "Configurações, sem internet" : s.state === "error" ? "Configurações, erro ao sincronizar"
+    : s.pending ? "Configurações, alterações esperando envio" : "Configurações, conta sincronizada";
 
 export default function App() {
   const [view, setView] = useState<View>(currentView());
   const [toastText, setToastText] = useState("");
   const [toastOn, setToastOn] = useState(false);
   const timer = useRef<number | undefined>(undefined);
+  const [sync, setSync] = useState<SyncStatus>(getStatus);
+  const [dataVersion, setDataVersion] = useState(0);
+  const [cartCount, setCartCount] = useState(() => loadCart().length);
+
+  useEffect(() => startAutoSync(), []);
+  useEffect(() => subscribe(setSync), []);
+  useEffect(() => {
+    // dados chegaram da conta, ou mudaram no aparelho: atualiza a tela e o contador do carrinho
+    const onData = () => { setDataVersion((v) => v + 1); setCartCount(loadCart().length); };
+    const onChange = () => setCartCount(loadCart().length);
+    window.addEventListener("gondola:data", onData);
+    window.addEventListener("gondola:changed", onChange);
+    window.addEventListener("storage", onChange);
+    return () => {
+      window.removeEventListener("gondola:data", onData);
+      window.removeEventListener("gondola:changed", onChange);
+      window.removeEventListener("storage", onChange);
+    };
+  }, []);
 
   useEffect(() => {
     const on = () => {
       setView(currentView());
+      setCartCount(loadCart().length);
       window.scrollTo(0, 0);
     };
     window.addEventListener("hashchange", on);
@@ -44,43 +68,47 @@ export default function App() {
     timer.current = window.setTimeout(() => setToastOn(false), 2800);
   }, []);
 
-  const toggleTheme = () => {
-    const cur = document.documentElement.dataset.theme ?? (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
-    const next = cur === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem("theme", next);
-    } catch {
-      /* ignora */
-    }
-  };
-
-  const active: Nav = view === "importar" ? "notas" : view;
-  const links = (["inicio", "escanear", "carrinho", "notas"] as Nav[]).map((v) => (
-    <a key={v} className="nav" href={`#${v}`} aria-current={active === v ? "page" : undefined}>
-      {v === "notas" ? icons.notas : icons[v]}
-      <span>{LABELS[v]}</span>
-    </a>
-  ));
+  const active: Nav | null = view === "importar" ? "notas" : view === "ajustes" ? null : view;
+  const links = (["inicio", "escanear", "carrinho", "notas"] as Nav[]).map((v) => {
+    const Icon = ICONS[v];
+    return (
+      <a key={v} className="nav" href={`#${v}`} aria-current={active === v ? "page" : undefined}>
+        <Icon />
+        <span>{LABELS[v]}</span>
+        {v === "carrinho" && cartCount > 0 && <span className="dot num" aria-label={`${cartCount} ${cartCount === 1 ? "item" : "itens"}`}>{cartCount}</span>}
+      </a>
+    );
+  });
+  const syncDot = sync.state === "off" ? "" : ` ${sync.state}${sync.pending ? " pending" : ""}`;
 
   return (
     <div className="app">
       <aside className="side" aria-label="Navegação principal">
         <div className="brand cond"><i />Gôndola</div>
         {links}
+        <a className="nav" href="#ajustes" aria-current={view === "ajustes" ? "page" : undefined}><IconGear /><span>Configurações</span></a>
       </aside>
       <main id="main">
         <div className="top">
           <h1>{TITLES[view]}</h1>
-          <button className="iconbtn" onClick={toggleTheme} aria-label="Alternar tema claro e escuro">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" /></svg>
-          </button>
+          <a className={`iconbtn sync${syncDot}`} href="#ajustes" aria-label={settingsLabel(sync)} title={settingsLabel(sync)} aria-current={view === "ajustes" ? "page" : undefined}>
+            <IconGear size={20} />
+          </a>
+          <button className="iconbtn" onClick={toggleTheme} aria-label="Alternar tema claro e escuro"><IconMoon /></button>
         </div>
-        {view === "inicio" && <Home />}
-        {view === "escanear" && <Scan toast={toast} />}
-        {view === "carrinho" && <Cart toast={toast} />}
-        {view === "importar" && <Import toast={toast} />}
-        {view === "notas" && <Notes toast={toast} />}
+        {sync.state === "offline" && view !== "ajustes" && (
+          <p className="msg warn" role="status">
+            Sem internet. Mostrando o que está guardado no aparelho{sync.pending ? `; ${sync.pending} ${sync.pending === 1 ? "alteração será enviada" : "alterações serão enviadas"} depois` : ""}.
+          </p>
+        )}
+        <div key={dataVersion} style={{ display: "contents" }}>
+          {view === "inicio" && <Home />}
+          {view === "escanear" && <Scan toast={toast} />}
+          {view === "carrinho" && <Cart toast={toast} />}
+          {view === "importar" && <Import toast={toast} />}
+          {view === "notas" && <Notes toast={toast} />}
+          {view === "ajustes" && <Settings toast={toast} />}
+        </div>
       </main>
       <nav className="bottom" aria-label="Navegação principal">{links}</nav>
       <div className={`toast${toastOn ? " on" : ""}`} role="status" aria-live="polite">{toastText}</div>

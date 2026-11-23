@@ -6,6 +6,11 @@
    - Resultado define o cenário: A (leitura direta grátis), B (captcha só na chave) ou C (alternativas e consulta paga opcional).
 2. (Feito para texto/PDF: `src/modules/nfce/uf/rj/parseConsultaText.ts`, 6 testes. Falta o leitor por HTML/consulta direta.) Módulo `src/modules/nfce/uf/rj` com leitura por âncoras, validação (soma = total, chave, CNPJ, data) e fixtures sem dados pessoais.
 3. Autenticação, perfil e importação de notas (QR, chave, XML/PDF, texto colado, manual).
+   - **Feito em 2026-11-23 (item 1 de `PROMPT-CONTINUACAO.md`):** login por código de 6 dígitos no e-mail (Configurações > Conta); notas, vínculos e carrinho sincronizados com o Supabase; aparelho como cache com fila de alterações para uso sem internet; "Sair e manter" ou "Sair e apagar do aparelho".
+   - Banco: migração `0003_sync.sql` aplicada (colunas da nota, `product_links`, `cart_items`, perfil criado no primeiro login, `save_receipt` só para o servidor).
+   - Função `save-receipt` publicada: confere o usuário, valida a nota (chave, CNPJ, soma, nenhum CPF) e grava de forma atômica.
+   - **Pendente (usuário):** no painel do Supabase, em Authentication > Email Templates, incluir `{{ .Token }}` nos modelos "Magic Link" e "Confirm signup" para o e-mail trazer o código de 6 dígitos. Configurar um serviço de e-mail próprio (SMTP) antes do grupo de teste: o padrão envia poucos e-mails por hora.
+   - Falta XML (item 3 da continuação) e entrada manual.
 4. Leitura ao vivo do produto (GTIN) com cartão de comparação e veredito.
 5. KPIs e gráficos, alertas e carrinho inteligente.
 6. OCR: A no aparelho; B opcional com consentimento e créditos (funções no servidor).

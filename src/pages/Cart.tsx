@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { loadCart, saveCart, type CartItem } from "../lib/cart.ts";
-import { money } from "../lib/format.ts";
+import { money, storeLabel } from "../lib/format.ts";
+import { IconCart } from "../components/Icons.tsx";
 import { findLink } from "../lib/links.ts";
 import { loadNotes } from "../lib/storage.ts";
 import { pricesForKeys, verdict } from "../modules/prices/analytics.ts";
@@ -16,6 +17,7 @@ export default function Cart({ toast }: { toast: (t: string) => void }) {
   if (items.length === 0)
     return (
       <div className="card empty">
+        <IconCart size={44} />
         <h3>Seu carrinho está vazio</h3>
         <p>Escaneie um produto para comparar o preço e adicionar aqui.</p>
         <a className="btn primary" href="#escanear">Escanear produto</a>
@@ -46,8 +48,8 @@ export default function Cart({ toast }: { toast: (t: string) => void }) {
           <div className="it" key={i.id}>
             <div>
               <strong>{i.name}</strong>
-              <div className="note">{i.storeName} · {money(i.shelfCents)} cada</div>
-              {v?.kind === "worse" && <div className="note" style={{ color: "var(--bad)" }}>↑ {money(v.best.unitPriceCents)} em {v.best.storeName}</div>}
+              <div className="note">{storeLabel(i.storeName)}, {money(i.shelfCents)} cada</div>
+              {v?.kind === "worse" && <div className="note" style={{ color: "var(--bad)" }}>↑ {money(v.best.unitPriceCents)} em {storeLabel(v.best.storeName)}</div>}
               {v?.kind === "best" && <div className="note" style={{ color: "var(--good)" }}>↓ melhor preço do seu histórico</div>}
             </div>
             <div className="cond num" style={{ fontSize: 22 }}>{money(i.shelfCents * i.qty)}</div>

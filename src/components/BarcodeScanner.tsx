@@ -50,9 +50,15 @@ export default function BarcodeScanner({ onCode }: { onCode: (code: string) => v
 
   return (
     <div>
-      {on && <video ref={video} className="video" muted playsInline aria-label="Imagem da câmera para ler o código de barras" />}
-      <div className="row">
-        {on ? <button className="btn" onClick={stop}>Parar câmera</button> : <button className="btn tag" onClick={start}>Ler código com a câmera</button>}
+      <div className={`scanner${on ? " live" : ""}`}>
+        {on && <video ref={video} muted playsInline aria-label="Imagem da câmera para ler o código de barras" />}
+        <span className="corner c1" aria-hidden="true" /><span className="corner c2" aria-hidden="true" />
+        <span className="corner c3" aria-hidden="true" /><span className="corner c4" aria-hidden="true" />
+        {on && <span className="line" aria-hidden="true" />}
+        {!on && <p>Aponte a câmera para o código de barras do produto</p>}
+      </div>
+      <div className="row" style={{ marginTop: 12 }}>
+        {on ? <button className="btn" onClick={stop}>Fechar câmera</button> : <button className="btn tag" onClick={start}>Abrir câmera</button>}
         <label className="btn">
           Enviar foto
           <input type="file" accept="image/*" className="sr" onChange={(e) => { void fromPhoto(e.target.files?.[0]); e.target.value = ""; }} />

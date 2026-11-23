@@ -1,4 +1,5 @@
 import type { RjItem } from "../modules/nfce/uf/rj/parseConsultaText.ts";
+import { enqueue } from "./outbox.ts";
 
 export interface SavedNote {
   accessKey: string;
@@ -32,14 +33,18 @@ export function hasNote(accessKey: string): boolean {
   return loadNotes().some((n) => n.accessKey === accessKey);
 }
 
-export function saveNote(n: SavedNote): void {
-  const all = loadNotes().filter((x) => x.accessKey !== n.accessKey);
-  all.push(n);
+/** Grava a lista inteira sem enfileirar (usado pela sincronização). */
+export function replaceNotes(all: SavedNote[]): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(all));
   } catch {
     throw new Error("Não foi possível guardar no aparelho (armazenamento cheio ou bloqueado).");
   }
+}
+
+export function saveNote(n: SavedNote): void {
+  replaceNotes([...loadNotes().filter((x) => x.accessKey !== n.accessKey), n]);
+  enqueue({ t: "note.save", note: n });
 }
 
 export function removeNote(accessKey: string): void {
@@ -48,4 +53,5 @@ export function removeNote(accessKey: string): void {
   } catch {
     /* ignora */
   }
+  enqueue({ t: "note.delete", accessKey });
 }

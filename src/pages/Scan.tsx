@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import BarcodeScanner from "../components/BarcodeScanner.tsx";
+import { IconDoc, IconScan } from "../components/Icons.tsx";
 import { loadCart, saveCart } from "../lib/cart.ts";
-import { money } from "../lib/format.ts";
+import { money, sentenceCase, storeLabel } from "../lib/format.ts";
 import { findLink, isBarcode, removeLink, saveLink, type ProductLink } from "../lib/links.ts";
 import { parseMoney } from "../lib/money.ts";
 import { loadNotes } from "../lib/storage.ts";
@@ -32,6 +33,7 @@ export default function Scan({ toast }: { toast: (t: string) => void }) {
   if (notes.length === 0)
     return (
       <div className="card empty">
+        <IconDoc size={44} />
         <h3>Importe uma nota primeiro</h3>
         <p>Para comparar na gôndola, o app precisa dos preços que você já pagou.</p>
         <a className="btn tag" href="#importar">Importar nota</a>
@@ -71,8 +73,7 @@ export default function Scan({ toast }: { toast: (t: string) => void }) {
   return (
     <div className="grid two">
       <section className="card" aria-labelledby="sc">
-        <h2 id="sc">Escanear produto</h2>
-        <p className="sub">Aponte para o código de barras da embalagem ou da etiqueta.</p>
+        <h2 id="sc" className="sr">Ler código de barras</h2>
         <BarcodeScanner onCode={accept} />
         <div className="field">
           <label htmlFor="cod">Ou digite o código de barras</label>
@@ -82,7 +83,7 @@ export default function Scan({ toast }: { toast: (t: string) => void }) {
         <div className="field">
           <label htmlFor="loja">Você está em</label>
           <select id="loja" value={store} onChange={(e) => setStore(e.target.value)}>
-            {stores.map((s) => <option key={s.cnpj} value={s.cnpj}>{s.name}</option>)}
+            {stores.map((s) => <option key={s.cnpj} value={s.cnpj}>{storeLabel(s.name)}</option>)}
             <option value={OTHER}>Outro mercado</option>
           </select>
         </div>
@@ -92,6 +93,7 @@ export default function Scan({ toast }: { toast: (t: string) => void }) {
       <section className="card" aria-labelledby="rs" aria-live="polite">
         {!barcode && (
           <div className="empty">
+            <IconScan size={44} />
             <h3 id="rs">Escaneie um produto</h3>
             <p>O preço de cada mercado onde você já comprou aparece aqui, antes de pôr no carrinho.</p>
           </div>
@@ -110,7 +112,7 @@ export default function Scan({ toast }: { toast: (t: string) => void }) {
               {filtered.map((p) => (
                 <label className="check" key={p.productKey}>
                   <input type="checkbox" checked={picked.includes(p.productKey)} onChange={(e) => setPicked(e.target.checked ? [...picked, p.productKey] : picked.filter((k) => k !== p.productKey))} />
-                  <span>{p.description}<span className="note"> · {p.storeName} · {money(p.unitPriceCents)}</span></span>
+                  <span>{sentenceCase(p.description)}<span className="note">, {storeLabel(p.storeName)}, {money(p.unitPriceCents)}</span></span>
                 </label>
               ))}
             </div>
@@ -136,7 +138,7 @@ export default function Scan({ toast }: { toast: (t: string) => void }) {
                 <tbody>
                   {known.length === 0 && <tr><td colSpan={2}>Sem preço nas suas notas.</td></tr>}
                   {known.map((o, i) => (
-                    <tr key={o.productKey}><td>{o.storeName}{i === 0 && known.length > 1 && <> <span className="pill good">↓ mais barato</span></>}</td><td className="r num">{money(o.unitPriceCents)}</td></tr>
+                    <tr key={o.productKey}><td>{storeLabel(o.storeName)}{i === 0 && known.length > 1 && <> <span className="pill good">↓ mais barato</span></>}</td><td className="r num">{money(o.unitPriceCents)}</td></tr>
                   ))}
                 </tbody>
               </table>

@@ -3,12 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test \"src/**/*.test.ts\""
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test \"src/**/*.test.ts\" \"supabase/functions/**/*.test.ts\""
   },
   "engines": {
     "node": ">=22.18"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.2",
     "@zxing/browser": "^0.2.1",
     "@zxing/library": "^0.23.0",
     "pdfjs-dist": "^6.5.438",

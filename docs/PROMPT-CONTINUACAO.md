@@ -23,6 +23,7 @@ A base é a branch `main` do GitHub (commit 5ea03f7 ou mais novo). **Não sobres
 - Carrinho: quantidades, total, economia possível.
 - Banco: 13 tabelas com RLS no Supabase (projeto CheckMercado, id `ldixuhfogqzsfwsntbia`), migrações 0001 e 0002 aplicadas.
 - 16 testes unitários (`npm test`).
+- **Item 1 feito (2026-11-23):** login por código no e-mail e sincronização de notas, vínculos e carrinho (migração 0003, função `save-receipt`). Visual alinhado ao protótipo: menu com Configurações, engrenagem no topo, visor da câmera, estados vazios com ícone, Notas com cartão de importação. 26 testes.
 
 ## O que fazer, nesta ordem
 Para cada item: propor o plano curto, implementar, testar (unitário e navegador), conferir o visual, commitar e dar push. Peça autorização antes de mexer em banco de produção.

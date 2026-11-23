@@ -5,11 +5,10 @@ import { money } from "../lib/format.ts";
 const dm = (iso: string) => new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 
 /** Linha de uma série (preço de um produto em um mercado ao longo das compras), com leitura por toque, mouse e setas. */
-export default function PriceChart({ points, label }: { points: Observation[]; label: string }) {
+export default function PriceChart({ points, label, table = false }: { points: Observation[]; label: string; table?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(320);
   const [idx, setIdx] = useState(points.length - 1);
-  const [table, setTable] = useState(false);
 
   useEffect(() => {
     const el = box.current;
@@ -44,7 +43,7 @@ export default function PriceChart({ points, label }: { points: Observation[]; l
     <div ref={box}>
       <div className="readout" aria-live="polite">
         <b>{dm(cur.date)}</b> <span className="cond num" style={{ fontSize: 22 }}>{money(cur.unitPriceCents)}</span>
-        {prev && <span className="note"> · antes {money(prev.unitPriceCents)}</span>}
+        {prev && <span className="note">na compra anterior: {money(prev.unitPriceCents)}</span>}
       </div>
       {table ? (
         <div className="tablewrap">
@@ -79,7 +78,6 @@ export default function PriceChart({ points, label }: { points: Observation[]; l
           {points.map((p, i) => <circle key={p.date} cx={x(i)} cy={y(vals[i]!)} r={i === idx ? 5 : 3} fill="var(--s1)" stroke="var(--surface)" strokeWidth="2" />)}
         </svg>
       )}
-      <button className="btn sm" onClick={() => setTable((v) => !v)} style={{ marginTop: 8 }}>{table ? "Ver gráfico" : "Ver tabela"}</button>
     </div>
   );
 }
