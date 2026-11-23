@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { BrowserCodeReader, IScannerControls } from "@zxing/browser";
+import { makeReader, type CodeFormat } from "../lib/codeReader.ts";
+
+export type { CodeFormat };
+
+// Câmera traseira, resolução alta: o QR da NFC-e é pequeno e denso; em 640x480 os módulos somem.
+const CONSTRAINTS: MediaStreamConstraints = {
+  audio: false,
+  video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+};
 
 function cameraError(e: unknown): string {
   const name = e instanceof Error ? e.name : "";
@@ -10,26 +18,28 @@ function cameraError(e: unknown): string {
   return "Não consegui abrir a câmera. Tente de novo, ou envie uma foto.";
 }
 
+/** Foco contínuo quando o aparelho permite (sem ele o QR do cupom fica borrado de perto). */
+function continuousFocus(stream: MediaStream): void {
+  const track = stream.getVideoTracks()[0];
+  const caps = (track?.getCapabilities?.() ?? {}) as { focusMode?: string[] };
+  if (caps.focusMode?.includes("continuous")) {
+    void track.applyConstraints({ advanced: [{ focusMode: "continuous" } as MediaTrackConstraintSet] }).catch(() => undefined);
+  }
+}
+
 /**
- * Liga a câmera traseira e lê códigos com o ZXing. Tudo roda no aparelho.
- * A câmera só é ligada depois que o <video> está na tela: antes, a imagem ia para
- * um elemento invisível e o usuário via só a área preta.
+ * Liga a câmera traseira e lê códigos quadro a quadro. Tudo roda no aparelho.
+ * A câmera só é ligada depois que o <video> está na tela (antes, a imagem ia para um elemento invisível).
  */
-export function useCameraReader(makeReader: () => BrowserCodeReader, onResult: (text: string) => void) {
+export function useCameraReader(formats: CodeFormat[], onResult: (text: string) => void) {
   const video = useRef<HTMLVideoElement>(null);
-  const controls = useRef<IScannerControls | null>(null);
   const done = useRef(onResult);
   done.current = onResult;
-  const make = useRef(makeReader);
+  const fmts = useRef(formats);
   const [on, setOn] = useState(false);
   const [err, setErr] = useState("");
 
-  const stop = useCallback(() => {
-    controls.current?.stop();
-    controls.current = null;
-    setOn(false);
-  }, []);
-
+  const stop = useCallback(() => setOn(false), []);
   const start = useCallback(() => {
     setErr("");
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -42,31 +52,45 @@ export function useCameraReader(makeReader: () => BrowserCodeReader, onResult: (
   }, []);
 
   useEffect(() => {
-    if (!on || !video.current) return;
+    const el = video.current;
+    if (!on || !el) return;
     let finished = false;
-    make.current()
-      .decodeFromConstraints({ audio: false, video: { facingMode: { ideal: "environment" } } }, video.current, (res) => {
-        if (!res || finished) return;
-        finished = true;
-        controls.current?.stop();
-        controls.current = null;
-        setOn(false);
-        done.current(res.getText());
-      })
-      .then((c) => {
-        if (finished) c.stop();
-        else controls.current = c;
-      })
-      .catch((e: unknown) => {
-        if (finished) return;
-        setOn(false);
-        setErr(cameraError(e));
-      });
-    return () => {
-      finished = true;
-      controls.current?.stop();
-      controls.current = null;
-    };
+    let timer = 0;
+    let stream: MediaStream | null = null;
+    const release = () => { window.clearTimeout(timer); stream?.getTracks().forEach((t) => t.stop()); stream = null; };
+    const end = (fn: () => void) => { if (finished) return; finished = true; release(); setOn(false); fn(); };
+
+    void (async () => {
+      try {
+        // câmera e leitor em paralelo (o leitor pode precisar baixar o motor na primeira vez)
+        const [s, reader] = await Promise.all([navigator.mediaDevices.getUserMedia(CONSTRAINTS), makeReader(fmts.current)]);
+        stream = s;
+        if (finished) { release(); return; }
+        el.srcObject = s;
+        continuousFocus(s);
+        await el.play().catch(() => undefined);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        const tick = async () => {
+          if (finished || !ctx) return;
+          try {
+            if (el.readyState >= 2 && el.videoWidth) {
+              canvas.width = el.videoWidth;
+              canvas.height = el.videoHeight;
+              ctx.drawImage(el, 0, 0);
+              const text = await reader.read(ctx.getImageData(0, 0, canvas.width, canvas.height));
+              if (text) { end(() => done.current(text)); return; }
+            }
+          } catch { /* quadro ruim: tenta o próximo */ }
+          timer = window.setTimeout(() => void tick(), 100);
+        };
+        void tick();
+      } catch (e) {
+        end(() => setErr(cameraError(e)));
+      }
+    })();
+
+    return () => { finished = true; release(); };
   }, [on]);
 
   return { video, on, err, setErr, start, stop };

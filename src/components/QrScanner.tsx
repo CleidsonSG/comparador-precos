@@ -1,4 +1,4 @@
-import { BrowserQRCodeReader } from "@zxing/browser";
+import { readImageFile } from "../lib/codeReader.ts";
 import { useCameraReader } from "./useCameraReader.ts";
 
 interface Props {
@@ -7,31 +7,28 @@ interface Props {
 
 /** Lê o QR do cupom pela câmera ou por foto. Tudo roda no aparelho; nada é enviado. */
 export default function QrScanner({ onText }: Props) {
-  const cam = useCameraReader(() => new BrowserQRCodeReader(), onText);
+  const cam = useCameraReader(["qr_code"], onText);
 
   const fromPhoto = async (f: File | undefined) => {
     if (!f) return;
     cam.setErr("");
-    const url = URL.createObjectURL(f);
-    try {
-      const res = await new BrowserQRCodeReader().decodeFromImageUrl(url);
-      onText(res.getText());
-    } catch {
-      cam.setErr("Não encontrei um QR nessa foto. Aproxime, deixe o QR reto e bem iluminado, e tente de novo.");
-    } finally {
-      URL.revokeObjectURL(url);
-    }
+    const text = await readImageFile(f, ["qr_code"]).catch(() => null);
+    if (text) onText(text);
+    else cam.setErr("Não encontrei o QR nessa foto. Tire a foto de perto, com o QR ocupando boa parte da imagem, reto e bem iluminado.");
   };
 
   return (
     <div>
       {cam.on && (
-        <div className="scanner live">
-          <video ref={cam.video} muted playsInline autoPlay aria-label="Imagem da câmera para ler o QR do cupom" />
-          <span className="corner c1" aria-hidden="true" /><span className="corner c2" aria-hidden="true" />
-          <span className="corner c3" aria-hidden="true" /><span className="corner c4" aria-hidden="true" />
-          <span className="line" aria-hidden="true" />
-        </div>
+        <>
+          <div className="scanner live">
+            <video ref={cam.video} muted playsInline autoPlay aria-label="Imagem da câmera para ler o QR do cupom" />
+            <span className="corner c1" aria-hidden="true" /><span className="corner c2" aria-hidden="true" />
+            <span className="corner c3" aria-hidden="true" /><span className="corner c4" aria-hidden="true" />
+            <span className="line" aria-hidden="true" />
+          </div>
+          <p className="note" style={{ margin: "8px 0 0" }}>Deixe o QR dentro dos cantos, a uns 15 cm, com boa luz e sem reflexo. Espere a imagem focar.</p>
+        </>
       )}
       <div className="row" style={{ marginTop: cam.on ? 12 : 0 }}>
         {cam.on ? (

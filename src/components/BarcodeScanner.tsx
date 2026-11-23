@@ -1,21 +1,18 @@
-import { BrowserMultiFormatReader } from "@zxing/browser";
+import { readImageFile, type CodeFormat } from "../lib/codeReader.ts";
 import { useCameraReader } from "./useCameraReader.ts";
+
+const FORMATS: CodeFormat[] = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"];
 
 /** Lê código de barras (EAN/UPC) pela câmera ou por foto. Tudo roda no aparelho. */
 export default function BarcodeScanner({ onCode }: { onCode: (code: string) => void }) {
-  const cam = useCameraReader(() => new BrowserMultiFormatReader(), onCode);
+  const cam = useCameraReader(FORMATS, onCode);
 
   const fromPhoto = async (f: File | undefined) => {
     if (!f) return;
     cam.setErr("");
-    const url = URL.createObjectURL(f);
-    try {
-      onCode((await new BrowserMultiFormatReader().decodeFromImageUrl(url)).getText());
-    } catch {
-      cam.setErr("Não encontrei um código de barras nessa foto. Aproxime, deixe o código reto e bem iluminado.");
-    } finally {
-      URL.revokeObjectURL(url);
-    }
+    const text = await readImageFile(f, FORMATS).catch(() => null);
+    if (text) onCode(text);
+    else cam.setErr("Não encontrei um código de barras nessa foto. Aproxime, deixe o código reto e bem iluminado.");
   };
 
   return (
@@ -27,6 +24,7 @@ export default function BarcodeScanner({ onCode }: { onCode: (code: string) => v
         {cam.on && <span className="line" aria-hidden="true" />}
         {!cam.on && <p>Aponte a câmera para o código de barras do produto</p>}
       </div>
+      {cam.on && <p className="note" style={{ margin: "8px 0 0" }}>Deixe o código na horizontal, dentro dos cantos, com boa luz.</p>}
       <div className="row" style={{ marginTop: 12 }}>
         {cam.on ? <button className="btn" onClick={cam.stop}>Fechar câmera</button> : <button className="btn tag" onClick={cam.start}>Abrir câmera</button>}
         <label className="btn">
