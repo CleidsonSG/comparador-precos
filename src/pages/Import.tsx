@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import QrScanner from "../components/QrScanner.tsx";
 import Review from "../components/Review.tsx";
-import { describeKey, extractAccessKey, formatKey, isValidAccessKey, officialConsultaUrl } from "../lib/accessKey.ts";
+import { countDigits, describeKey, extractAccessKey, formatKey, isValidAccessKey, officialConsultaUrl } from "../lib/accessKey.ts";
 import { hasNote, saveNote } from "../lib/storage.ts";
 import { parseRjConsultaText, type RjParseResult } from "../modules/nfce/uf/rj/parseConsultaText.ts";
 
@@ -25,7 +25,14 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
   const acceptInput = (raw: string) => {
     setKeyMsg(""); reset();
     const k = extractAccessKey(raw);
-    if (!k) { setKey(null); setKeyMsg("Não encontrei uma chave de 44 números nesse conteúdo."); return; }
+    if (!k) {
+      const n = countDigits(raw);
+      setKey(null);
+      setKeyMsg(n > 0 && n !== 44
+        ? `Encontrei ${n} ${n === 1 ? "número" : "números"}, mas a chave tem 44 (11 grupos de 4). Confira se copiou a chave inteira: no WhatsApp ela pode ter sido cortada.`
+        : "Não encontrei uma chave de 44 números nesse conteúdo.");
+      return;
+    }
     if (!isValidAccessKey(k)) { setKey(null); setKeyMsg("A chave tem 44 números, mas o dígito verificador não confere. Confira se digitou tudo certo."); return; }
     if (describeKey(k).uf !== "33") { setKey(null); setKeyMsg("Esta nota é de outro estado. Por enquanto só o Rio de Janeiro tem leitor."); return; }
     setKey(k);
@@ -70,11 +77,14 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     } finally { setBusy(false); }
   };
 
+  // A chave vem do texto/PDF; se ele não trouxer, vale a do passo 1.
+  const noteKey = (result?.note?.accessKey ?? key ?? "").replace(/\D/g, "");
+
   const save = () => {
-    if (!result?.ok || !result.store || !result.note?.accessKey) return;
+    if (!result?.ok || !result.store || !result.note || !noteKey) return;
     try {
       saveNote({
-        accessKey: result.note.accessKey.replace(/\D/g, ""), savedAt: new Date().toISOString(),
+        accessKey: noteKey, savedAt: new Date().toISOString(),
         storeName: result.store.name, storeCnpj: result.store.cnpj, storeAddress: result.store.address,
         issuedAt: result.note.issuedAt, number: result.note.number, series: result.note.series,
         totalCents: result.totals.totalCents ?? 0, discountCents: result.totals.discountCents ?? 0, payableCents: result.totals.payableCents ?? 0,
@@ -85,7 +95,6 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     } catch (e) { setErr(e instanceof Error ? e.message : "Erro ao guardar."); }
   };
 
-  const noteKey = (result?.note?.accessKey ?? "").replace(/\D/g, "") ?? "";
 
   return (
     <>
@@ -127,26 +136,31 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
           <div className="n" aria-hidden="true">3</div>
           <div>
             <h2>Traga a nota de volta</h2>
-            <p className="sub">Selecione todo o texto da página e cole aqui, ou envie o PDF salvo da página. O CPF e o nome do consumidor são ignorados e não ficam guardados.</p>
+            <p className="sub">Selecione todo o texto da página e cole aqui, ou envie o PDF salvo da página. Já tem o PDF ou o texto? Pode usar direto, sem os passos 1 e 2: a chave vem junto. O CPF e o nome do consumidor são ignorados e não ficam guardados.</p>
             <div className="row">
-              <button className="btn tag" onClick={paste} disabled={!key}>Colar da área de transferência</button>
-              <label className={`btn`} aria-disabled={!key}>
+              <button className="btn tag" onClick={paste}>Colar da área de transferência</button>
+              <label className="btn">
                 Enviar PDF
-                <input type="file" accept="application/pdf" className="sr" disabled={!key} onChange={(e) => { void onPdf(e.target.files?.[0]); e.target.value = ""; }} />
+                <input type="file" accept="application/pdf" className="sr" onChange={(e) => { void onPdf(e.target.files?.[0]); e.target.value = ""; }} />
               </label>
             </div>
             <div className="field">
               <label htmlFor="texto">Ou cole o texto aqui</label>
               <textarea id="texto" value={text} onChange={(e) => setText(e.target.value)} placeholder="Texto da consulta…" />
             </div>
-            <button className="btn" disabled={!key || !text.trim()} onClick={() => parse(text)}>Ler texto</button>
+            <button className="btn" disabled={!text.trim()} onClick={() => parse(text)}>Ler texto</button>
             {busy && <div className="msg info" role="status">Lendo o PDF…</div>}
             {err && <div className="msg bad" role="alert">{err}</div>}
           </div>
         </div>
       </section>
 
-      {result && <Review result={result} duplicate={hasNote(noteKey)} onSave={save} onCancel={reset} />}
+      {result && (
+        <Review
+          result={result} duplicate={!!noteKey && hasNote(noteKey)} onSave={save} onCancel={reset}
+          blocked={result.ok && !noteKey ? "O texto não traz a chave de acesso. Informe a chave no passo 1 para guardar esta nota." : undefined}
+        />
+      )}
     </>
   );
 }

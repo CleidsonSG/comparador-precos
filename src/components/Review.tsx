@@ -7,13 +7,15 @@ interface Props {
   duplicate: boolean;
   onSave: () => void;
   onCancel: () => void;
+  /** Motivo que impede guardar (ex.: falta a chave de acesso). */
+  blocked?: string;
 }
 
-export default function Review({ result, duplicate, onSave, onCancel }: Props) {
+export default function Review({ result, duplicate, onSave, onCancel, blocked }: Props) {
   const [confirmed, setConfirmed] = useState(false);
   const { store, note, items, totals } = result;
   const needsConfirm = result.ok && !result.validated;
-  const canSave = result.ok && (result.validated || confirmed);
+  const canSave = result.ok && !blocked && (result.validated || confirmed);
 
   return (
     <section className="card" aria-labelledby="rev">
@@ -75,6 +77,7 @@ export default function Review({ result, duplicate, onSave, onCancel }: Props) {
           <span>Conferi os itens e valores com a nota e quero guardar mesmo assim.</span>
         </label>
       )}
+      {blocked && <div className="msg bad" role="alert">{blocked}</div>}
       <div className="row">
         <button className="btn primary" disabled={!canSave} onClick={onSave}>Guardar nota</button>
         <button className="btn" onClick={onCancel}>Descartar</button>

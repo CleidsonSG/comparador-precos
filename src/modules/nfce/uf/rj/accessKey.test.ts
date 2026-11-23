@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { extractAccessKey, isValidAccessKey, describeKey, officialConsultaUrl, RJ_CONSULTA_URL } from "../../../../lib/accessKey.ts";
+import { countDigits, extractAccessKey, isValidAccessKey, describeKey, officialConsultaUrl, RJ_CONSULTA_URL } from "../../../../lib/accessKey.ts";
 
 const KEY = "33261175315333031926655060001310021048579170";
 
@@ -17,6 +17,19 @@ test("extrai a chave de link de QR, texto com espaços, XML e dígitos soltos", 
   assert.equal(extractAccessKey(`<infNFe Id="NFe${KEY}" versao="4.00">`), KEY);
   assert.equal(extractAccessKey(`Chave de acesso:\n3326 1175 3153 3303 1926 6550 6000 1310 0210 4857 9170\n`), KEY);
   assert.equal(extractAccessKey("nada aqui"), null);
+});
+
+test("aceita a chave copiada do WhatsApp (invisíveis, sem espaços, quebras de linha)", () => {
+  assert.equal(extractAccessKey(KEY), KEY);
+  assert.equal(extractAccessKey(`‎3326 1175 3153 3303 1926 6550 6000 1310\n0210 4857 9170‏`), KEY);
+  assert.equal(extractAccessKey("3326.1175.3153.3303.1926.6550.6000.1310.0210.4857.9170"), KEY);
+  assert.equal(extractAccessKey("33261175315333031926 655060001310021048579170"), KEY);
+});
+
+test("chave incompleta não é aceita e o total de números é informado", () => {
+  const cut = "3326 1175 3153 3303 1926 6550 6000 1310";
+  assert.equal(extractAccessKey(cut), null);
+  assert.equal(countDigits(cut), 32);
 });
 
 test("descreve a chave", () => {

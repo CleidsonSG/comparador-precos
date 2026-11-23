@@ -35,7 +35,8 @@ export function describeKey(key: string): KeyInfo {
 
 /** Procura uma chave de 44 dígitos em um link de QR, texto digitado/colado ou XML. */
 export function extractAccessKey(input: string): string | null {
-  const text = input.trim();
+  // WhatsApp e outros apps inserem caracteres invisíveis (marcas de direção, espaço sem largura) ao copiar
+  const text = input.replace(/[​-‏‪-‮⁠﻿]/g, "").trim();
   if (!text) return null;
   const fromParam = /[?&]p=(\d{44})/i.exec(safeDecode(text));
   if (fromParam) return fromParam[1];
@@ -46,7 +47,18 @@ export function extractAccessKey(input: string): string | null {
   const spaced = /(?:\d{4}\s+){10}\d{4}/.exec(text);
   if (spaced) return spaced[0].replace(/\s+/g, "");
   const plain = /\d{44}/.exec(text);
-  return plain ? plain[0] : null;
+  if (plain) return plain[0];
+  // só números com qualquer separador (espaço, ponto, traço, quebra de linha, barra)
+  if (/^[\d\s.\-/|]+$/.test(text)) {
+    const all = text.replace(/\D/g, "");
+    if (all.length === 44) return all;
+  }
+  return null;
+}
+
+/** Quantos números há no que foi digitado ou colado (para explicar uma chave incompleta). */
+export function countDigits(input: string): number {
+  return input.replace(/\D/g, "").length;
 }
 
 function safeDecode(s: string): string {
