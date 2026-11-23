@@ -2,6 +2,8 @@
 
 Leia primeiro: `CLAUDE.md`, `docs/DESIGN.md`, `docs/RJ-ACESSO.md`, `docs/SKILLS.md` e o protótipo `site/index.html` (referência visual e de comportamento, com dados fictícios).
 
+**Onde paramos:** ver `docs/ONDE-PARAMOS.md` (o que foi feito, o que falta e como testar no celular).
+
 ## Ponto de partida
 A base é a branch `main` do GitHub (commit 5ea03f7 ou mais novo). **Não sobrescreva** o que já existe e **não reintroduza** vínculo automático de produtos por descrição. Se houver conflito, mantenha a versão do `main` e aproveite só o que for melhor da outra, sem quebrar as regras abaixo. Antes de qualquer tela, rode `git pull`.
 
