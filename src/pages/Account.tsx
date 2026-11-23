@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { formatDateTime } from "../lib/format.ts";
-import { supabase } from "../lib/supabase.ts";
+import { authRedirectUrl, supabase } from "../lib/supabase.ts";
 import { afterSignIn, getStatus, signOut, subscribe, syncNow, type SyncStatus } from "../lib/sync.ts";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,7 +63,7 @@ export default function Account({ toast }: { toast: (t: string) => void }) {
     const em = email.trim().toLowerCase();
     if (!EMAIL.test(em)) { setErr("Digite um e-mail válido, como nome@exemplo.com."); return; }
     setBusy(true); setErr("");
-    const { error } = await sb.auth.signInWithOtp({ email: em, options: { shouldCreateUser: true } });
+    const { error } = await sb.auth.signInWithOtp({ email: em, options: { shouldCreateUser: true, emailRedirectTo: authRedirectUrl() } });
     setBusy(false);
     if (error) { setErr(authMessage(error)); return; }
     setEmail(em); setStep("code"); setCode("");
@@ -92,7 +92,7 @@ export default function Account({ toast }: { toast: (t: string) => void }) {
     return (
       <section className="card" aria-labelledby="acc">
         <h2 id="acc">Conta</h2>
-        <p className="sub">Guarde notas, vínculos e carrinho na nuvem e use em qualquer aparelho. Sem senha: enviamos um código por e-mail. Sem conta, tudo fica só neste aparelho.</p>
+        <p className="sub">Guarde notas, vínculos e carrinho na nuvem e use em qualquer aparelho. Sem senha: enviamos um e-mail para você entrar. Sem conta, tudo fica só neste aparelho.</p>
         {step === "email" ? (
           <form onSubmit={sendCode} noValidate>
             <div className="field">
@@ -100,13 +100,13 @@ export default function Account({ toast }: { toast: (t: string) => void }) {
               <input id="em" type="email" inputMode="email" autoComplete="email" placeholder="nome@exemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!err} aria-describedby={err ? "accErr" : undefined} />
             </div>
             {err && <p id="accErr" className="msg bad" role="alert">{err}</p>}
-            <button className="btn primary" disabled={busy}>{busy ? "Enviando…" : "Enviar código"}</button>
+            <button className="btn primary" disabled={busy}>{busy ? "Enviando…" : "Enviar e-mail de acesso"}</button>
           </form>
         ) : (
           <form onSubmit={verify} noValidate>
-            <p className="msg info" role="status">Enviamos um código para {email}. Ele vale por alguns minutos.</p>
+            <p className="msg info" role="status">Enviamos um e-mail para {email}. Toque no link "Sign in" do e-mail neste aparelho, ou digite aqui o código, se o e-mail trouxer um. Vale por alguns minutos; confira também o spam.</p>
             <div className="field">
-              <label htmlFor="code">Código do e-mail</label>
+              <label htmlFor="code">Código do e-mail (se houver)</label>
               <input id="code" className="num" inputMode="numeric" autoComplete="one-time-code" maxLength={8} value={code} onChange={(e) => setCode(e.target.value)} aria-invalid={!!err} aria-describedby={err ? "accErr" : undefined} />
             </div>
             {err && <p id="accErr" className="msg bad" role="alert">{err}</p>}

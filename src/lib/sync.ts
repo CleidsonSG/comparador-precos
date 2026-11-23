@@ -206,9 +206,16 @@ export function startAutoSync(): () => void {
   const onQueue = () => setStatus({});
   const { data } = supabase.auth.onAuthStateChange((event, session) => {
     // sem await aqui: chamadas ao Supabase dentro deste callback podem travar
-    if (event === "INITIAL_SESSION") {
+    if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
       if (session && activeUser() === session.user.id) soon();
-      else if (!session && activeUser()) { setActiveUser(null); setStatus({ state: "off" }); }
+      else if (session) {
+        // entrou pelo link do e-mail (ou a sessão existe sem o aparelho saber): prepara os dados desta conta
+        const id = session.user.id;
+        window.setTimeout(() => {
+          if (activeUser() === id) return; // o login por código já tratou
+          void afterSignIn(id).then(() => window.dispatchEvent(new Event("gondola:signedin")));
+        }, 0);
+      } else if (event === "INITIAL_SESSION" && activeUser()) { setActiveUser(null); setStatus({ state: "off" }); }
     }
     if (event === "SIGNED_OUT") { setActiveUser(null); setStatus({ state: "off" }); }
   });

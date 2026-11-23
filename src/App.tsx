@@ -8,6 +8,7 @@ import Settings from "./pages/Settings.tsx";
 import { IconCart, IconDoc, IconGear, IconHome, IconMoon, IconScan } from "./components/Icons.tsx";
 import { getStatus, startAutoSync, subscribe, type SyncStatus } from "./lib/sync.ts";
 import { toggleTheme } from "./lib/theme.ts";
+import { authErrorFromUrl } from "./lib/supabase.ts";
 import { loadCart } from "./lib/cart.ts";
 
 type View = "inicio" | "escanear" | "carrinho" | "importar" | "notas" | "ajustes";
@@ -67,6 +68,15 @@ export default function App() {
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setToastOn(false), 2800);
   }, []);
+
+  useEffect(() => {
+    // volta do link do e-mail: erro (link vencido) ou login concluído
+    const err = authErrorFromUrl();
+    if (err) { history.replaceState(null, "", `${location.pathname}#ajustes`); setView("ajustes"); toast(err); }
+    const ok = () => { toast("Conta conectada"); location.hash = "#ajustes"; };
+    window.addEventListener("gondola:signedin", ok);
+    return () => window.removeEventListener("gondola:signedin", ok);
+  }, [toast]);
 
   const active: Nav | null = view === "importar" ? "notas" : view === "ajustes" ? null : view;
   const links = (["inicio", "escanear", "carrinho", "notas"] as Nav[]).map((v) => {
