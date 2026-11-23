@@ -7,7 +7,8 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function authMessage(e: { status?: number; message?: string } | null): string {
   if (!e) return "Algo deu errado. Tente de novo.";
-  if (e.status === 429) return "Muitos pedidos de código. Espere alguns minutos e tente de novo.";
+  if (e.status === 429)
+    return "Limite de e-mails de acesso atingido. Tente de novo em até 1 hora e peça um só e-mail. Enquanto isso, o app funciona sem login e envia tudo para a conta quando você entrar.";
   if (/expired|invalid/i.test(e.message ?? "")) return "Código errado ou vencido. Confira o e-mail ou peça um novo código.";
   if (!navigator.onLine || /fetch/i.test(e.message ?? "")) return "Sem internet. Conecte-se para entrar na conta.";
   return "Não foi possível entrar agora. Tente de novo.";

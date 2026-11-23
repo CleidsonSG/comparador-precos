@@ -167,7 +167,18 @@ function clearLocal(): void {
 /** Depois do login: decide o que fazer com os dados já guardados no aparelho. */
 export async function afterSignIn(userId: string): Promise<void> {
   const owner = dataOwner();
-  if (owner && owner !== userId) clearLocal(); // dados de outra conta não vão para esta
+  if (owner && owner !== userId) {
+    // O aparelho guarda dados de outra conta (saiu com "manter"), talvez com notas importadas sem login.
+    // Nunca apaga sem perguntar: junta a esta conta ou apaga do aparelho.
+    const n = loadNotes().length, l = loadLinks().length, c = loadCart().length;
+    if (n + l + c > 0) {
+      const join = window.confirm(
+        `Este aparelho tem ${n} ${n === 1 ? "nota" : "notas"} guardada${n === 1 ? "" : "s"} de outra conta ou de quando você estava sem login.\n\n` +
+        "OK: juntar à conta que está entrando agora.\nCancelar: apagar do aparelho (a outra conta continua com os dados dela na nuvem).",
+      );
+      if (!join) clearLocal();
+    } else clearLocal();
+  }
   setActiveUser(userId);
   setDataOwner(userId);
   if (activeUser() !== userId) return;
