@@ -22,6 +22,8 @@ export default function Notes({ toast }: { toast: (t: string) => void }) {
   };
 
   return (
+    <>
+    <div className="row" style={{ marginBottom: 12 }}><a className="btn tag" href="#importar">Importar nota</a></div>
     <div className="card list">
       {sorted.map((n) => (
         <div key={n.accessKey}>
@@ -50,5 +52,6 @@ export default function Notes({ toast }: { toast: (t: string) => void }) {
         </div>
       ))}
     </div>
+    </>
   );
 }

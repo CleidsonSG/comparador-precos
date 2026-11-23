@@ -39,3 +39,21 @@ test("gasto por mês e por mercado", () => {
 test("sem repetição não há média", () => {
   assert.equal(averageChange(priceChanges([notes[0]!])), null);
 });
+
+import { latestPrices, pricesForKeys, verdict } from "./analytics.ts";
+
+test("últimos preços e vínculo entre mercados", () => {
+  assert.equal(latestPrices(notes).get("111:1")!.unitPriceCents, 1100);
+  const p = pricesForKeys(["111:1", "222:1"], notes);
+  assert.deepEqual(p.map((o) => o.unitPriceCents), [700, 1100]);
+  assert.deepEqual(pricesForKeys(["999:9"], notes), []);
+});
+
+test("veredito da etiqueta", () => {
+  const known = pricesForKeys(["111:1", "222:1"], notes);
+  assert.equal(verdict(650, known).kind, "best");
+  const w = verdict(1000, known);
+  assert.equal(w.kind, "worse");
+  if (w.kind === "worse") { assert.equal(w.extraCents, 300); assert.equal(w.best.cnpj, "222"); }
+  assert.equal(verdict(500, []).kind, "unknown");
+});

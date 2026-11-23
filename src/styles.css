@@ -34,7 +34,7 @@ main{flex:1;width:100%;max-width:1000px;margin:0 auto;padding:16px 16px 96px}
 .top h1{font-size:22px;line-height:1.2;margin:0;flex:1}
 .iconbtn{min-width:44px;min-height:44px;display:inline-grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:12px;cursor:pointer}
 .iconbtn:hover{background:var(--soft)}
-.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:20}
+.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:20}
 .nav{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;justify-content:center;border-radius:12px;color:var(--ink2);text-decoration:none;font-size:12px;font-weight:600}
 .nav svg{width:22px;height:22px}
 .nav[aria-current="page"]{color:var(--ink);background:var(--soft)}
@@ -104,3 +104,5 @@ td.r,th.r{text-align:right}
 .bar .fill{height:100%;background:var(--s1);border-radius:0 4px 4px 0;transition:width .5s}
 .readout{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;min-height:34px}
 .field select{min-height:46px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface);width:100%}
+.pick{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:4px 12px;margin:6px 0}
+.pick .check{margin:8px 0}

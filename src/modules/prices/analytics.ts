@@ -86,3 +86,30 @@ export function spendByStore(notes: SavedNote[]): StoreSpend[] {
   }
   return [...m.values()].sort((a, b) => b.cents - a.cents);
 }
+
+/** Último preço de cada produto (mercado + código), pela data da nota. */
+export function latestPrices(notes: SavedNote[]): Map<string, Observation> {
+  const m = new Map<string, Observation>();
+  for (const o of observations(notes)) m.set(o.productKey, o); // já ordenado por data
+  return m;
+}
+
+/** Últimos preços dos produtos vinculados, do mais barato ao mais caro. */
+export function pricesForKeys(keys: string[], notes: SavedNote[]): Observation[] {
+  const latest = latestPrices(notes);
+  return keys.flatMap((k) => latest.get(k) ?? []).sort((a, b) => a.unitPriceCents - b.unitPriceCents);
+}
+
+export type Verdict =
+  | { kind: "unknown" }
+  | { kind: "best"; best: Observation; savingCents: number }
+  | { kind: "worse"; best: Observation; extraCents: number; extraPct: number };
+
+/** Compara o preço da etiqueta com o menor último preço que o usuário já pagou. */
+export function verdict(shelfCents: number, known: Observation[]): Verdict {
+  const best = known[0];
+  if (!best) return { kind: "unknown" };
+  if (shelfCents <= best.unitPriceCents) return { kind: "best", best, savingCents: best.unitPriceCents - shelfCents };
+  const extra = shelfCents - best.unitPriceCents;
+  return { kind: "worse", best, extraCents: extra, extraPct: extra / best.unitPriceCents };
+}
