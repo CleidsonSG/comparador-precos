@@ -18,3 +18,11 @@ export function storeLabel(s: string): string {
   const base = s.replace(/\s+(S\.?\s?\/?A\.?|LTDA\.?|EIRELI|ME|EPP)\s*$/i, "").trim() || s.trim();
   return base.toLocaleLowerCase("pt-BR").replace(/(^|[\s(/-])(\p{L})/gu, (_, a: string, b: string) => a + b.toLocaleUpperCase("pt-BR"));
 }
+
+const plural = (n: number, um: string, varios: string) => `${n} ${n === 1 ? um : varios}`;
+
+/** O que há na conta (igual ao aparelho depois de sincronizar). */
+export function accountSummary(notes: number, links: number, cart: number): string {
+  if (notes === 0 && links === 0 && cart === 0) return "Nenhuma nota, vínculo ou item de carrinho na conta.";
+  return `Na conta: ${plural(notes, "nota", "notas")}, ${plural(links, "produto vinculado", "produtos vinculados")} e ${plural(cart, "item", "itens")} no carrinho.`;
+}

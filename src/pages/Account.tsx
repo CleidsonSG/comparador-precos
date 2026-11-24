@@ -1,7 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { formatDateTime } from "../lib/format.ts";
+import { accountSummary, formatDateTime } from "../lib/format.ts";
 import { authRedirectUrl, supabase } from "../lib/supabase.ts";
 import { afterSignIn, getStatus, signOut, subscribe, syncNow, type SyncStatus } from "../lib/sync.ts";
+import { loadNotes } from "../lib/storage.ts";
+import { loadLinks } from "../lib/links.ts";
+import { loadCart } from "../lib/cart.ts";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -20,7 +23,15 @@ function StatusLine({ s }: { s: SyncStatus }) {
     return <p className="msg warn" role="status">Sem internet. {s.pending ? `${s.pending} ${s.pending === 1 ? "alteração será enviada" : "alterações serão enviadas"} quando a conexão voltar.` : "Seus dados continuam no aparelho."}</p>;
   if (s.state === "error") return <p className="msg bad" role="alert">Não foi possível sincronizar. Tente de novo em instantes.</p>;
   if (s.pending) return <p className="msg warn" role="status">{s.pending} {s.pending === 1 ? "alteração esperando" : "alterações esperando"} envio.</p>;
-  return <p className="msg good" role="status">✓ Tudo guardado na sua conta{s.lastAt ? `, ${formatDateTime(s.lastAt)}` : ""}.</p>;
+  // "sincronizada" = aparelho e conta iguais (inclusive quando tudo foi excluído); a segunda linha diz o que há nela
+  return (
+    <div className="msg good" role="status">
+      <div>
+        <b>✓ Conta sincronizada{s.lastAt ? ` em ${formatDateTime(s.lastAt)}` : ""}.</b>
+        <div style={{ fontWeight: 500 }}>{accountSummary(loadNotes().length, loadLinks().length, loadCart().length)}</div>
+      </div>
+    </div>
+  );
 }
 
 /** Cartão "Conta" das Configurações: entrar por código no e-mail, estado da sincronização e sair. */
