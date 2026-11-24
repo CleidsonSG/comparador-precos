@@ -4,6 +4,7 @@ import { formatCnpj, formatDateTime, formatQty, money, sentenceCase, storeLabel 
 import { loadNotes, removeNote, type SavedNote } from "../lib/storage.ts";
 import { loadPending, removePending, type PendingNote } from "../lib/pending.ts";
 import { describeKey } from "../lib/accessKey.ts";
+import Modal from "../components/Modal.tsx";
 
 function ImportCard() {
   return (
@@ -56,11 +57,12 @@ function PendingCard({ toast }: { toast: (t: string) => void }) {
 export default function Notes({ toast }: { toast: (t: string) => void }) {
   const [notes, setNotes] = useState<SavedNote[]>(loadNotes);
   const [open, setOpen] = useState<string | null>(null);
+  const [toDelete, setToDelete] = useState<SavedNote | null>(null);
   const sorted = [...notes].sort((a, b) => (b.issuedAt ?? b.savedAt).localeCompare(a.issuedAt ?? a.savedAt));
 
-  const del = (k: string) => {
-    if (!confirm("Apagar esta nota? Os preços dela saem do histórico.")) return;
-    removeNote(k); setNotes(loadNotes()); setOpen(null); toast("Nota apagada");
+  const del = () => {
+    if (!toDelete) return;
+    removeNote(toDelete.accessKey); setNotes(loadNotes()); setOpen(null); setToDelete(null); toast("Nota excluída");
   };
 
   return (
@@ -89,9 +91,12 @@ export default function Notes({ toast }: { toast: (t: string) => void }) {
                     {n.validated ? <span className="pill good">✓ conferida</span> : <span className="pill warn">totais não conferidos</span>}
                   </div>
                 </div>
-                <button className="btn sm" aria-expanded={open === n.accessKey} onClick={() => setOpen(open === n.accessKey ? null : n.accessKey)}>
-                  {open === n.accessKey ? "Fechar itens" : "Ver itens"}
-                </button>
+                <div className="row">
+                  <button className="btn sm" aria-expanded={open === n.accessKey} onClick={() => setOpen(open === n.accessKey ? null : n.accessKey)}>
+                    {open === n.accessKey ? "Fechar itens" : "Ver itens"}
+                  </button>
+                  <button className="btn sm danger" onClick={() => setToDelete(n)} aria-label={`Excluir a nota de ${storeLabel(n.storeName)}, ${formatDateTime(n.issuedAt)}`}>Excluir</button>
+                </div>
                 {open === n.accessKey && (
                   <div className="noteopen">
                     <div className="note">CNPJ {formatCnpj(n.storeCnpj)}, {n.storeAddress}</div>
@@ -104,7 +109,6 @@ export default function Notes({ toast }: { toast: (t: string) => void }) {
                         ))}</tbody>
                       </table>
                     </div>
-                    <button className="btn danger sm" onClick={() => del(n.accessKey)}>Apagar nota</button>
                   </div>
                 )}
               </div>
@@ -112,6 +116,25 @@ export default function Notes({ toast }: { toast: (t: string) => void }) {
           </div>
         )}
       </section>
+
+      <Modal
+        open={!!toDelete}
+        badge="!"
+        tone="bad"
+        title="Excluir esta nota?"
+        onClose={() => setToDelete(null)}
+        actions={<>
+          <button className="btn danger" onClick={del}>Excluir</button>
+          <button className="btn" autoFocus onClick={() => setToDelete(null)}>Cancelar</button>
+        </>}
+      >
+        {toDelete && (
+          <p className="sub">
+            <b>{storeLabel(toDelete.storeName)}</b>, {formatDateTime(toDelete.issuedAt)}, {toDelete.items.length} {toDelete.items.length === 1 ? "item" : "itens"}, {money(toDelete.payableCents)}.<br />
+            Os preços dela saem do histórico e das comparações. Se você entrou na conta, ela também sai dos outros aparelhos.
+          </p>
+        )}
+      </Modal>
     </>
   );
 }

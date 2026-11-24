@@ -43,7 +43,7 @@ test("QR lido: chave fica pendente, próximo passo aparece e dá para continuar 
 test("texto com soma conferida é guardado sozinho; Desfazer volta para a revisão", async ({ page }) => {
   await page.goto("/#importar");
   await pasteInField(page, LAYOUT);
-  await expect(page.getByText("Nota guardada", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Nota importada" })).toBeVisible();
   await expect(page.getByText("A soma dos itens conferiu com o total")).toBeVisible();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("gondola.notes.v1") || "[]").length)).toBe(1);
   // nada de CPF ou nome guardado
@@ -53,7 +53,7 @@ test("texto com soma conferida é guardado sozinho; Desfazer volta para a revis�
   await expect(page.getByRole("heading", { name: "Confira a nota" })).toBeVisible();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("gondola.notes.v1") || "[]").length)).toBe(0);
   await page.getByRole("button", { name: "Guardar nota" }).click();
-  await expect(page.getByText("Nota guardada", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Nota importada" })).toBeVisible();
 });
 
 test("texto copiado no celular (\"Vl. Total\" no fim da linha) com a chave do QR é guardado sozinho", async ({ page, context }) => {
@@ -63,8 +63,56 @@ test("texto copiado no celular (\"Vl. Total\" no fim da linha) com a chave do QR
   await page.getByRole("button", { name: "Usar esta chave" }).click();
   await page.evaluate((t) => navigator.clipboard.writeText(t), CELULAR);
   await page.getByRole("button", { name: "Colar da área de transferência" }).click();
-  await expect(page.getByText("Nota guardada", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Nota importada" })).toBeVisible();
   await expect(page.getByText("49 itens")).toBeVisible();
+});
+
+test("caixa Nota importada: OK fecha e deixa a tela pronta para a próxima nota", async ({ page }) => {
+  await page.goto("/#importar");
+  await pasteInField(page, LAYOUT);
+  const box = page.getByRole("dialog", { name: "Nota importada" });
+  await expect(box).toBeVisible();
+  await expect(box).toContainText("49 itens");
+  await expect(box).toContainText("A soma dos itens conferiu com o total");
+  await expect(box.getByRole("button", { name: "OK" })).toBeFocused();
+  await box.getByRole("button", { name: "OK" }).click();
+  await expect(box).toBeHidden();
+  await expect(page.locator("#texto")).toHaveValue("");
+  await expect(page.getByText("Chave válida do RJ")).toHaveCount(0);
+});
+
+test("nota que já estava importada: avisa na caixa e não substitui sem pedir", async ({ page }) => {
+  await page.goto("/#importar");
+  await pasteInField(page, LAYOUT);
+  await page.getByRole("dialog", { name: "Nota importada" }).getByRole("button", { name: "OK" }).click();
+  const before = await page.evaluate(() => localStorage.getItem("gondola.notes.v1"));
+  await pasteInField(page, CELULAR);
+  const box = page.getByRole("dialog", { name: "Esta nota já estava importada" });
+  await expect(box).toBeVisible();
+  await expect(box).toContainText("Nada foi alterado");
+  await box.getByRole("button", { name: "OK" }).click();
+  expect(await page.evaluate(() => localStorage.getItem("gondola.notes.v1"))).toBe(before);
+  // substituir, só quando pedido
+  await pasteInField(page, CELULAR);
+  await page.getByRole("dialog", { name: "Esta nota já estava importada" }).getByRole("button", { name: "Substituir pela nova leitura" }).click();
+  await expect(page.getByRole("dialog", { name: "Nota importada" })).toBeVisible();
+});
+
+test("Notas: Excluir fora de Ver itens, com confirmação", async ({ page }) => {
+  await page.goto("/#importar");
+  await pasteInField(page, LAYOUT);
+  await page.getByRole("dialog", { name: "Nota importada" }).getByRole("button", { name: "OK" }).click();
+  await page.goto("/#notas");
+  await page.getByRole("button", { name: /^Excluir a nota de/ }).click();
+  const box = page.getByRole("dialog", { name: "Excluir esta nota?" });
+  await expect(box).toBeVisible();
+  await box.getByRole("button", { name: "Cancelar" }).click();
+  await expect(box).toBeHidden();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("gondola.notes.v1") || "[]").length)).toBe(1);
+  await page.getByRole("button", { name: /^Excluir a nota de/ }).click();
+  await page.getByRole("dialog", { name: "Excluir esta nota?" }).getByRole("button", { name: "Excluir", exact: true }).click();
+  await expect(page.getByText("Nenhuma nota ainda")).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("gondola.notes.v1") || "[]").length)).toBe(0);
 });
 
 test("texto sem soma conferida mostra a revisão e não guarda sozinho", async ({ page }) => {
@@ -91,7 +139,7 @@ test("voltar da Fazenda oferece colar e guarda a nota", async ({ page, context }
   await expect(page.getByRole("heading", { name: "Trouxe a nota da Fazenda?" })).toBeVisible();
   await page.evaluate((t) => navigator.clipboard.writeText(t), LAYOUT);
   await page.getByRole("button", { name: "Colar agora" }).click();
-  await expect(page.getByText("Nota guardada", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Nota importada" })).toBeVisible();
   await page.goto("/#notas");
   await expect(page.getByRole("heading", { name: "Pendentes" })).toHaveCount(0);
 });

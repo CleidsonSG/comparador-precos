@@ -2,16 +2,19 @@ import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react
 import QrScanner from "../components/QrScanner.tsx";
 import Review from "../components/Review.tsx";
 import { countDigits, describeKey, extractAccessKey, formatKey, isValidAccessKey, officialConsultaUrl } from "../lib/accessKey.ts";
-import { hasNote, removeNote, saveNote } from "../lib/storage.ts";
+import { hasNote, loadNotes, removeNote, saveNote } from "../lib/storage.ts";
+import Modal from "../components/Modal.tsx";
 import { addPending, getPending, removePending } from "../lib/pending.ts";
 import { takeShared } from "../lib/shared.ts";
 import { useOnline } from "../lib/online.ts";
-import { money, storeLabel } from "../lib/format.ts";
+import { formatDateTime, money, storeLabel } from "../lib/format.ts";
 import { parseRjConsultaText, type RjParseResult } from "../modules/nfce/uf/rj/parseConsultaText.ts";
 
 const AWAIT_KEY = "gondola.awaiting"; // a pessoa foi à consulta da Fazenda e deve voltar com a nota
 
-interface Saved { accessKey: string; store: string; items: number; payableCents: number }
+interface Saved { accessKey: string; store: string; items: number; payableCents: number; issuedAt: string | null; validated: boolean }
+/** nota lida que já estava guardada */
+interface Dup extends Saved { savedAt: string; result: RjParseResult }
 
 const scrollTo = (id: string) => window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
 
@@ -26,14 +29,15 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
   const [err, setErr] = useState("");
   const [result, setResult] = useState<RjParseResult | null>(null);
   const [saved, setSaved] = useState<Saved | null>(null);
+  const [dup, setDup] = useState<Dup | null>(null);
   const [back, setBack] = useState(false); // voltou da Fazenda: oferece colar
   const keyRef = useRef<string | null>(null);
   keyRef.current = key;
 
-  const reset = () => { setResult(null); setErr(""); setText(""); setSaved(null); };
+  const reset = () => { setResult(null); setErr(""); setText(""); setSaved(null); setDup(null); };
 
   const acceptInput = useCallback((raw: string, opts: { scroll?: boolean } = {}) => {
-    setKeyMsg(""); setResult(null); setErr(""); setText(""); setSaved(null);
+    setKeyMsg(""); setResult(null); setErr(""); setText(""); setSaved(null); setDup(null);
     const k = extractAccessKey(raw);
     if (!k) {
       const n = countDigits(raw);
@@ -66,14 +70,14 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
       removePending(k);
       try { sessionStorage.removeItem(AWAIT_KEY); } catch { /* ignora */ }
       setBack(false);
-      setSaved({ accessKey: k, store: storeLabel(r.store.name), items: r.items.length, payableCents: r.totals.payableCents ?? 0 });
-      scrollTo("salva");
+      setDup(null);
+      setSaved({ accessKey: k, store: storeLabel(r.store.name), items: r.items.length, payableCents: r.totals.payableCents ?? 0, issuedAt: r.note.issuedAt, validated: r.validated });
     } catch (e) { setErr(e instanceof Error ? e.message : "Erro ao guardar."); }
   }, []);
 
   /** Lê o texto da consulta. Se a soma confere e a nota é nova, guarda sozinho (com "Desfazer"). */
   const parse = useCallback((t: string) => {
-    setErr(""); setSaved(null);
+    setErr(""); setSaved(null); setDup(null);
     const r = parseRjConsultaText(t);
     const cur = keyRef.current;
     const fromText = r.note?.accessKey?.replace(/\D/g, "") || "";
@@ -86,7 +90,11 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     if (fromText && !cur) { setKey(fromText); setQrText(getPending(fromText)?.qrText ?? null); }
     setResult(r);
     setBack(false);
-    if (r.ok && r.validated && k && !hasNote(k)) save(r, k);
+    const old = r.ok && k ? loadNotes().find((n) => n.accessKey === k) : undefined;
+    if (old && r.store && r.note) {
+      // já importada: avisa numa caixa e não substitui sem pedir
+      setDup({ accessKey: k, store: storeLabel(r.store.name), items: r.items.length, payableCents: r.totals.payableCents ?? 0, issuedAt: r.note.issuedAt, validated: r.validated, savedAt: old.savedAt, result: r });
+    } else if (r.ok && r.validated && k) save(r, k);
     else scrollTo("revisao");
   }, [save]);
 
@@ -158,6 +166,11 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     try { await navigator.clipboard.writeText(key); toast("Chave copiada"); } catch { toast("Não consegui copiar. Selecione a chave e copie."); }
   };
 
+  const finish = () => {
+    setSaved(null); setDup(null); setKey(null); setQrText(null); setTyped(""); setResult(null); setErr(""); setText(""); setBack(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const undo = () => {
     if (!saved) return;
     removeNote(saved.accessKey);
@@ -175,7 +188,7 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     <>
       <p className="sub">Três passos: identifique a nota, abra a consulta oficial e traga o resultado de volta.</p>
 
-      {back && !saved && (
+      {back && !saved && !dup && (
         <section className="card back" aria-labelledby="voltou">
           <h2 id="voltou">Trouxe a nota da Fazenda?</h2>
           <p className="sub">Na página da nota, selecione todo o texto e copie. Depois toque em <b>Colar agora</b>. A nota é conferida e guardada sozinha.</p>
@@ -190,21 +203,45 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
         </section>
       )}
 
-      {saved && (
-        <section className="card" id="salva" aria-labelledby="salvah">
-          <div className="msg good" role="status" style={{ margin: 0 }}>
-            <div>
-              <b id="salvah">Nota guardada</b>
-              <div>{saved.store}, {saved.items} {saved.items === 1 ? "item" : "itens"}, {money(saved.payableCents)}. A soma dos itens conferiu com o total.</div>
-            </div>
-          </div>
-          <div className="row" style={{ marginTop: 12 }}>
-            <a className="btn primary" href="#notas">Ver notas</a>
-            <button className="btn" onClick={undo}>Desfazer</button>
-            <button className="btn" onClick={() => { setKey(null); setQrText(null); setTyped(""); reset(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>Importar outra</button>
-          </div>
-        </section>
-      )}
+      <Modal
+        open={!!saved}
+        badge="✓"
+        title="Nota importada"
+        onClose={finish}
+        actions={<>
+          <button className="btn primary" autoFocus onClick={finish}>OK</button>
+          <a className="btn" href="#notas">Ver notas</a>
+          <button className="btn" onClick={undo}>Desfazer</button>
+        </>}
+      >
+        {saved && (
+          <p className="sub" role="status">
+            <b>{saved.store}</b>, {formatDateTime(saved.issuedAt)}.<br />
+            {saved.items} {saved.items === 1 ? "item" : "itens"}, {money(saved.payableCents)} pagos.
+            {saved.validated ? " A soma dos itens conferiu com o total." : ""}
+          </p>
+        )}
+      </Modal>
+
+      <Modal
+        open={!!dup}
+        badge="i"
+        tone="info"
+        title="Esta nota já estava importada"
+        onClose={finish}
+        actions={<>
+          <button className="btn primary" autoFocus onClick={finish}>OK</button>
+          <a className="btn" href="#notas">Ver notas</a>
+          <button className="btn" onClick={() => { if (dup) save(dup.result, dup.accessKey); }}>Substituir pela nova leitura</button>
+        </>}
+      >
+        {dup && (
+          <p className="sub" role="status">
+            <b>{dup.store}</b>, {formatDateTime(dup.issuedAt)}, {dup.items} {dup.items === 1 ? "item" : "itens"}, {money(dup.payableCents)}.<br />
+            Guardada em {formatDateTime(dup.savedAt)}. Nada foi alterado.
+          </p>
+        )}
+      </Modal>
 
       <section className="card">
         <div className={`step${key ? " done" : ""}`}>
@@ -269,7 +306,7 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
         </div>
       </section>
 
-      {result && !saved && (
+      {result && !saved && !dup && (
         <div id="revisao">
           <Review
             result={result} duplicate={!!noteKey && hasNote(noteKey)} onSave={() => save(result, noteKey)} onCancel={reset}

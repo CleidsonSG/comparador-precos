@@ -52,7 +52,7 @@ test("compartilhar o texto da nota com o app guarda a nota (sem enviar ao servid
     const t = document.createElement("textarea"); t.name = "text"; t.value = text; f.append(t);
     document.body.append(f); f.submit();
   }, LAYOUT);
-  await expect(page.getByText("Nota guardada", { exact: true })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("dialog", { name: "Nota importada" })).toBeVisible({ timeout: 15_000 });
   // o servidor de arquivos não aceita POST: se a nota foi guardada, quem atendeu foi o service worker, no aparelho
   expect(page.url()).toMatch(/#importar$/);
 });

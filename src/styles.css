@@ -191,3 +191,17 @@ ul.plain{padding-left:18px;margin:6px 0 0;display:grid;gap:6px}
 .steps-ios:last-child{margin-bottom:0}
 .app-set{flex-wrap:wrap}
 .msg.update{align-items:center;justify-content:space-between;flex-wrap:wrap}
+/* Caixa suspensa (diálogo) */
+.modal{border:0;padding:0;background:transparent;color:var(--ink);max-width:min(440px,calc(100vw - 32px));width:100%;margin:auto}
+.modal::backdrop{background:rgba(8,12,18,.55)}
+.modal-box{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center;animation:modal-in .2s ease-out}
+.modal-box h2{margin:6px 0 8px;font-size:20px}
+.modal-box .sub{margin:0 0 16px;line-height:1.5}
+.modal-badge{width:52px;height:52px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:800;background:var(--good-bg);color:var(--good)}
+.modal-actions{display:flex;flex-direction:column;gap:8px}
+.modal-actions .btn{width:100%}
+.modal-badge.bad{background:var(--bad-bg);color:var(--bad)}
+.modal-badge.info{background:var(--soft);color:var(--ink)}
+@media(min-width:520px){.modal-actions{flex-direction:row;flex-wrap:wrap;justify-content:center}.modal-actions .btn{width:auto}}
+@keyframes modal-in{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.modal-box{animation:none}}
