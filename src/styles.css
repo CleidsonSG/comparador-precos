@@ -139,6 +139,8 @@ a.iconbtn{color:inherit;text-decoration:none}
 .scanner .line{position:absolute;left:16%;right:16%;height:2px;background:var(--tag);box-shadow:0 0 12px var(--tag);animation:scan 2.2s ease-in-out infinite;z-index:1}
 @keyframes scan{0%,100%{top:22%}50%{top:76%}}
 .scanner p{margin:0;font-size:14px;text-align:center;padding:0 24px;z-index:1}
+.scanner .cam-wait{color:#fff;background:rgba(0,0,0,.45);padding:6px 12px;border-radius:10px}
+.cam-ctl{margin-top:10px}
 
 /* Notas: opções de importação e lista */
 .opts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:12px}
