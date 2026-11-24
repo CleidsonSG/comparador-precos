@@ -22,3 +22,22 @@
 - Valor por foto (OCR avançado) e por nota (consulta paga, se necessária)
 - Provedor de pagamento para recarga de créditos (no teste: créditos manuais)
 - Provedor da consulta paga de NFC-e do RJ (só se a verificação indicar necessidade)
+
+## App Android (futuro, decidido em 2026-11-24)
+
+**Objetivo:** ler o QR e guardar a nota sozinho, de graça, sem copiar e colar.
+
+**Por que o site (PWA) não consegue:** o RJ bloqueia o IP do Supabase (`docs/RJ-ACESSO.md`) e o navegador não deixa um site ler a página de outro (CORS). O site só pode *abrir* a consulta.
+
+**Como fazer:**
+- Empacotar o app atual com **Capacitor** (mesmo código React; sem reescrever telas).
+- Plugin nativo pequeno: abre a consulta oficial numa **WebView visível**, no celular e na internet do próprio usuário; quando a página termina de carregar, lê `document.body.innerText` e devolve ao app, que usa o leitor que já existe (`parseConsultaText.ts`) e guarda a nota.
+- Nada é contornado: é o mesmo que o usuário abrir a página. Se aparecer captcha, quem resolve é o usuário. Sem proxy, sem troca de IP, sem desligar certificado.
+- CPF e nome do consumidor continuam ignorados pelo leitor e nunca guardados.
+- Interface carregada do site publicado (atualiza sem reinstalar); só mudanças na parte nativa pedem APK novo.
+
+**Distribuição:** APK instalado direto (a Play Store segue fora do escopo até o usuário pedir). O Android pede "permitir instalar desta fonte" na primeira vez.
+
+**Pré-requisitos:** Android Studio e JDK no computador; chave de assinatura guardada com segurança (sem ela não dá para atualizar o app); teste no celular do usuário.
+
+**iPhone:** continua no site instalado (Safari > Compartilhar > Adicionar à Tela de Início), com copiar e colar. Reavaliar depois.

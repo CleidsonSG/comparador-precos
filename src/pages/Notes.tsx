@@ -2,6 +2,8 @@ import { useState } from "react";
 import { IconDoc, IconKey, IconScan } from "../components/Icons.tsx";
 import { formatCnpj, formatDateTime, formatQty, money, sentenceCase, storeLabel } from "../lib/format.ts";
 import { loadNotes, removeNote, type SavedNote } from "../lib/storage.ts";
+import { loadPending, removePending, type PendingNote } from "../lib/pending.ts";
+import { describeKey } from "../lib/accessKey.ts";
 
 function ImportCard() {
   return (
@@ -13,6 +15,40 @@ function ImportCard() {
         <a className="opt" href="#importar?chave"><IconKey size={26} /><b>Digitar a chave de acesso</b><span className="note">Os 44 números impressos no cupom</span></a>
       </div>
       <p className="note" style={{ margin: "12px 0 0" }}>CPF e nome do consumidor nunca são guardados.</p>
+    </section>
+  );
+}
+
+function PendingCard({ toast }: { toast: (t: string) => void }) {
+  const [list, setList] = useState<PendingNote[]>(loadPending);
+  if (list.length === 0) return null;
+  // nome do mercado, quando já existe nota dele
+  const names = new Map(loadNotes().map((n) => [n.storeCnpj, storeLabel(n.storeName)]));
+  const drop = (k: string) => { removePending(k); setList(loadPending()); toast("Pendente descartada"); };
+  return (
+    <section className="card" aria-labelledby="pend">
+      <h2 id="pend">Pendentes</h2>
+      <p className="sub">Chaves lidas que ainda esperam os itens da consulta da Fazenda.</p>
+      <div className="list">
+        {list.map((p) => {
+          const d = describeKey(p.accessKey);
+          return (
+            <div key={p.accessKey} className="noteitem">
+              <div className="it">
+                <div>
+                  <b>{names.get(d.cnpj) ?? `CNPJ ${formatCnpj(d.cnpj)}`}</b>
+                  <div className="note">Nota {Number(d.number)}, de {d.yearMonth.slice(2)}/20{d.yearMonth.slice(0, 2)}. Lida em {formatDateTime(p.readAt)}</div>
+                </div>
+                <div className="right"><span className="pill warn">falta trazer os itens</span></div>
+              </div>
+              <div className="row">
+                <a className="btn sm primary" href={`#importar?chave=${p.accessKey}`}>Continuar</a>
+                <button className="btn sm" onClick={() => drop(p.accessKey)}>Descartar</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }
@@ -30,6 +66,7 @@ export default function Notes({ toast }: { toast: (t: string) => void }) {
   return (
     <>
       <ImportCard />
+      <PendingCard toast={toast} />
       <section className="card" aria-labelledby="suas">
         <h2 id="suas">Suas notas</h2>
         {sorted.length === 0 ? (

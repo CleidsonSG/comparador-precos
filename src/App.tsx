@@ -10,6 +10,8 @@ import { getStatus, startAutoSync, subscribe, type SyncStatus } from "./lib/sync
 import { toggleTheme } from "./lib/theme.ts";
 import { authErrorFromUrl } from "./lib/supabase.ts";
 import { loadCart } from "./lib/cart.ts";
+import ErrorBoundary from "./components/ErrorBoundary.tsx";
+import { InstallSheet, StatusBars } from "./components/Pwa.tsx";
 
 type View = "inicio" | "escanear" | "carrinho" | "importar" | "notas" | "ajustes";
 type Nav = "inicio" | "escanear" | "carrinho" | "notas";
@@ -106,11 +108,8 @@ export default function App() {
           </a>
           <button className="iconbtn" onClick={toggleTheme} aria-label="Alternar tema claro e escuro"><IconMoon /></button>
         </div>
-        {sync.state === "offline" && view !== "ajustes" && (
-          <p className="msg warn" role="status">
-            Sem internet. Mostrando o que está guardado no aparelho{sync.pending ? `; ${sync.pending} ${sync.pending === 1 ? "alteração será enviada" : "alterações serão enviadas"} depois` : ""}.
-          </p>
-        )}
+        <StatusBars pending={sync.pending} />
+        <ErrorBoundary resetKey={view}>
         <div key={dataVersion} style={{ display: "contents" }}>
           {view === "inicio" && <Home />}
           {view === "escanear" && <Scan toast={toast} />}
@@ -119,8 +118,10 @@ export default function App() {
           {view === "notas" && <Notes toast={toast} />}
           {view === "ajustes" && <Settings toast={toast} />}
         </div>
+        </ErrorBoundary>
       </main>
       <nav className="bottom" aria-label="Navegação principal">{links}</nav>
+      <InstallSheet />
       <div className={`toast${toastOn ? " on" : ""}`} role="status" aria-live="polite">{toastText}</div>
     </div>
   );

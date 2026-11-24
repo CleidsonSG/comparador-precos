@@ -174,3 +174,20 @@ ul.plain{padding-left:18px;margin:6px 0 0;display:grid;gap:6px}
 .field select{min-height:46px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface);width:100%}
 .pick{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:4px 12px;margin:6px 0}
 .pick .check{margin:8px 0}
+/* Importar: próximo passo, volta da Fazenda */
+.card.next{outline:3px solid var(--tag);outline-offset:-3px}
+.nexthint{margin:4px 0 8px;font-weight:700;color:var(--ink)}
+.card.back{border:2px solid var(--tag)}
+/* Instalar como app */
+.sheet-wrap{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom));z-index:40;display:flex;justify-content:center;padding:0 12px;pointer-events:none}
+.sheet{pointer-events:auto;display:flex;gap:14px;align-items:flex-start;width:100%;max-width:520px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.25);animation:sheet-in .25s ease-out}
+.sheet img{border-radius:14px;flex:none}
+.sheet h2{margin:0 0 4px;font-size:18px}
+.sheet .sub{margin:0 0 12px}
+@keyframes sheet-in{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+@media(min-width:900px){.sheet-wrap{bottom:24px;left:236px}}
+.steps-ios{margin:0 0 12px;padding-left:20px;line-height:1.5}
+.steps-ios:last-child{margin-bottom:0}
+.app-set{flex-wrap:wrap}
+.msg.update{align-items:center;justify-content:space-between;flex-wrap:wrap}

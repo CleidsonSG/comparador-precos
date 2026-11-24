@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getThemePref, setThemePref, type ThemePref } from "../lib/theme.ts";
 import Account from "./Account.tsx";
+import { InstallSetting } from "../components/Pwa.tsx";
 
 export default function Settings({ toast }: { toast: (t: string) => void }) {
   const [theme, setTheme] = useState<ThemePref>(getThemePref);
@@ -22,6 +23,10 @@ export default function Settings({ toast }: { toast: (t: string) => void }) {
             <option value="light">Claro</option>
             <option value="dark">Escuro</option>
           </select>
+        </div>
+        <div className="set app-set">
+          <div><b>Instalar como app</b><div className="note">Abre pela lista de apps, em tela cheia e sem internet.</div></div>
+          <InstallSetting />
         </div>
         <div className="set">
           <div><b>Privacidade</b><div className="note">Nunca guardamos CPF nem nome do consumidor, nem no aparelho, nem na conta.</div></div>

@@ -16,11 +16,15 @@
     "isolatedModules": true,
     "types": [
       "node",
-      "vite/client"
+      "vite/client",
+      "vite-plugin-pwa/client"
     ]
   },
   "include": [
     "src",
     "vite.config.ts"
+  ],
+  "exclude": [
+    "src/sw.ts"
   ]
 }

@@ -26,6 +26,9 @@ A base é a branch `main` do GitHub (commit 5ea03f7 ou mais novo). **Não sobres
 - Banco: 13 tabelas com RLS no Supabase (projeto CheckMercado, id `ldixuhfogqzsfwsntbia`), migrações 0001 e 0002 aplicadas.
 - 16 testes unitários (`npm test`).
 - **Item 1 feito (2026-11-23):** login por código no e-mail e sincronização de notas, vínculos e carrinho (migração 0003, função `save-receipt`). Visual alinhado ao protótipo: menu com Configurações, engrenagem no topo, visor da câmera, estados vazios com ícone, Notas com cartão de importação. 26 testes.
+- **Leitura de QR e código de barras refeita (2026-11-23):** `src/lib/scan.ts` + zxing-cpp em worker, três tratamentos de imagem; lê as fotos reais de cupom. Testes no navegador: `npm run test:e2e`.
+- **Importar mais curto (2026-11-24):** chave lida fica como **pendente** em Notas; próximo passo destacado; ao voltar da Fazenda o app oferece **Colar agora**; nota com soma conferida é **guardada sozinha** (com Desfazer). Pendentes ficam só no aparelho (não sincronizam: exigiria migração).
+- **Item 5 feito em parte (2026-11-24):** service worker (`src/sw.ts`, vite-plugin-pwa), app abre e lê QR sem internet; ícones PNG e maskable; convite "Instalar o Gôndola como app" na primeira visita e em Configurações; **Compartilhar > Gôndola** no Android (texto ou PDF da nota, atendido no aparelho); faixa de sem internet e de versão nova; tela de erro. Falta: esqueletos de carregamento nas telas que vierem a buscar dados na rede.
 
 ## O que fazer, nesta ordem
 Para cada item: propor o plano curto, implementar, testar (unitário e navegador), conferir o visual, commitar e dar push. Peça autorização antes de mexer em banco de produção.
@@ -39,6 +42,7 @@ Para cada item: propor o plano curto, implementar, testar (unitário e navegador
 7. **Preços colaborativos (opcional) com moderação:** descartar preços muito fora da média, exigir confirmação de outros usuários e permitir denúncia. Usar a função `get_shared_prices`, que não expõe dados pessoais.
 8. **OCR da etiqueta:** opção A no aparelho (gratuita, sempre mostra o valor lido para confirmar ou corrigir com um toque). Opção B avançada e paga por foto, com aviso de custo uma única vez, aceite lembrado e cancelamento depois. Cobrança por créditos pré-pagos, validada no servidor.
 9. **Consulta paga opcional:** escolher e testar um provedor de consulta por chave, avisando custo e limitações (pode sofrer o mesmo bloqueio).
+10. **Futuro: app Android de verdade (Capacitor), leitura automática e gratuita da nota.** Decidido em 2026-11-24, sem data. Detalhes em `docs/PROXIMOS-PASSOS.md` ("App Android"). O iPhone continua no site instalado (PWA), com copiar e colar.
 
 ## Pendências que dependem do usuário
 - Testar a câmera real (QR do cupom e código de barras).
