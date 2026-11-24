@@ -5,6 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { distort, fakeKey, fakeQrUrl, qrPng } from "./helpers.ts";
 
 const LAYOUT = readFileSync("tests/fixtures/nfce-rj/atacadao-marica-2026-11-13.layout.txt", "utf8"); // soma confere
+const CELULAR = readFileSync("tests/fixtures/nfce-rj/atacadao-marica-2026-11-13.celular.txt", "utf8"); // copiado no Chrome do celular
 const RAW = readFileSync("tests/fixtures/nfce-rj/atacadao-marica-2026-11-13.raw.txt", "utf8"); // soma não conferida
 const FIXTURE_KEY = (/(\d{4}\s?){11}/.exec(LAYOUT.slice(LAYOUT.indexOf("Chave de acesso")))?.[0] ?? "").replace(/\D/g, "");
 
@@ -53,6 +54,17 @@ test("texto com soma conferida é guardado sozinho; Desfazer volta para a revis�
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("gondola.notes.v1") || "[]").length)).toBe(0);
   await page.getByRole("button", { name: "Guardar nota" }).click();
   await expect(page.getByText("Nota guardada", { exact: true })).toBeVisible();
+});
+
+test("texto copiado no celular (\"Vl. Total\" no fim da linha) com a chave do QR é guardado sozinho", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/#importar");
+  await page.locator("#chave").fill(FIXTURE_KEY);
+  await page.getByRole("button", { name: "Usar esta chave" }).click();
+  await page.evaluate((t) => navigator.clipboard.writeText(t), CELULAR);
+  await page.getByRole("button", { name: "Colar da área de transferência" }).click();
+  await expect(page.getByText("Nota guardada", { exact: true })).toBeVisible();
+  await expect(page.getByText("49 itens")).toBeVisible();
 });
 
 test("texto sem soma conferida mostra a revisão e não guarda sozinho", async ({ page }) => {

@@ -67,7 +67,8 @@ export function parseRjConsultaText(input: string): RjParseResult {
   // ---- itens ----
   const items: RjItem[] = [];
   const head = /^(.*?)\s*\(Código:\s*(\d+)\s*\)\s*(?:Vl\. Total)?$/;
-  const body = /^Qtde\.:\s*([\d.,]+)\s+UN:\s*([A-Za-z]+)(\d?)\s+Vl\. Unit\.:\s*([\d.,]+)(?:\s+([\d.]*,\d{2}))?$/;
+  // "Vl. Total" pode vir na linha do nome (computador) ou no fim desta linha, após uma tabulação (Chrome do celular)
+  const body = /^Qtde\.:\s*([\d.,]+)\s+UN:\s*([A-Za-z]+)(\d?)\s+Vl\. Unit\.:\s*([\d.,]+)(?:\s+Vl\.\s*Total)?(?:\s+([\d.]*,\d{2}))?$/;
   const money = /^[\d.]*,\d{2}$/;
   let pending: { description: string; storeCode: string } | null = null;
   let waitingTotal: Omit<RjItem, "totalCents"> | null = null;

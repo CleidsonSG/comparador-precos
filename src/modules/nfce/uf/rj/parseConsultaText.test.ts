@@ -6,15 +6,16 @@ import { parseRjConsultaText } from "./parseConsultaText.ts";
 const dir = new URL("../../../../../tests/fixtures/nfce-rj/", import.meta.url);
 const load = (n: string) => readFileSync(new URL(n, dir), "utf8");
 
-for (const layout of ["raw", "layout"]) {
+// raw: texto do PDF; layout: copiado no computador; celular: copiado no Chrome do celular ("Vl. Total" no fim da linha da quantidade)
+for (const layout of ["raw", "layout", "celular"]) {
   test(`lê a nota do RJ (${layout})`, () => {
     const r = parseRjConsultaText(load(`atacadao-marica-2026-11-13.${layout}.txt`));
     assert.deepEqual(r.errors, []);
     assert.equal(r.ok, true);
     assert.equal(r.items.length, 49);
     // o texto "raw" veio do PDF sem os valores dos totais: lê os itens, mas não consegue validar a soma
-    assert.equal(r.validated, layout === "layout");
-    if (layout === "layout") {
+    assert.equal(r.validated, layout !== "raw");
+    if (layout !== "raw") {
       assert.equal(r.totals.totalCents, 91464);
       assert.equal(r.totals.discountCents, 1095);
       assert.equal(r.totals.payableCents, 90369);

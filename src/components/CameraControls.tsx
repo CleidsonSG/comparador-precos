@@ -1,4 +1,5 @@
 import type { useCameraReader } from "./useCameraReader.ts";
+import { cameraName } from "../lib/cameraPick.ts";
 
 type Cam = ReturnType<typeof useCameraReader>;
 
@@ -12,7 +13,7 @@ export default function CameraControls({ cam }: { cam: Cam }) {
           <span className="sr">Câmera</span>
           <select className="inline-select" value={cam.current} onChange={(e) => cam.chooseCamera(e.target.value)} aria-label="Escolher câmera">
             {!cam.cameras.some((c) => c.id === cam.current) && <option value={cam.current}>Câmera atual</option>}
-            {cam.cameras.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            {cam.cameras.map((c) => <option key={c.id} value={c.id}>{cameraName(c, cam.cameras)}</option>)}
           </select>
         </label>
       )}

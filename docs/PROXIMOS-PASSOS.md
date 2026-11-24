@@ -41,3 +41,16 @@
 **Pré-requisitos:** Android Studio e JDK no computador; chave de assinatura guardada com segurança (sem ela não dá para atualizar o app); teste no celular do usuário.
 
 **iPhone:** continua no site instalado (Safari > Compartilhar > Adicionar à Tela de Início), com copiar e colar. Reavaliar depois.
+
+## Trazer a nota da Fazenda sem copiar e colar (futuro, registrado em 2026-11-24)
+
+**Problema:** hoje a pessoa abre a consulta, seleciona todo o texto, copia, volta e cola. São muitos toques, e o texto muda conforme o navegador. Exemplo: no Chrome do celular, "Vl. Total" vem no fim da linha da quantidade (`tests/fixtures/nfce-rj/atacadao-marica-2026-11-13.celular.txt`), e no computador vem na linha do produto. Cada formato novo quebra o leitor até ser ajustado.
+
+**Ideias para avaliar (só registro, nada implementado):**
+1. **App Android com leitura automática** (ver "App Android" acima): a página é lida pelo próprio app, sem copiar. É o caminho mais eficaz.
+2. **Compartilhar > Gôndola** (já existe no Android com o app instalado): medir se é mais fácil que copiar e colar, e deixar o passo a passo mais visível na tela.
+3. **PDF da página:** na Fazenda, "Compartilhar > Imprimir > Salvar como PDF" e compartilhar o PDF com o Gôndola. O leitor de PDF já existe; conferir se o texto do PDF do celular traz os totais (o `raw.txt` não traz e a soma não confere).
+4. **Leitor mais tolerante:** em vez de depender de quebras de linha, achar cada item pelas âncoras (`(Código: N)`, `Qtde.:`, `UN:`, `Vl. Unit.:` e o primeiro valor `0,00` depois delas). Testar com textos copiados no Chrome e no Samsung Internet (Android), no Safari (iPhone) e no computador, sempre anonimizados (CPF e nome `[removido]`).
+5. **Consulta paga** (item 9): automática, mas com custo por nota.
+
+**Regras que continuam valendo:** sem contornar bloqueio ou captcha; CPF e nome do consumidor nunca guardados; textos de teste só anonimizados.
