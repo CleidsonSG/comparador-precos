@@ -112,7 +112,11 @@ export default function Home() {
               </div>
             ))}
           </div>
-          {stores.length < 2 && <p className="note">A comparação de preços entre mercados chega quando houver notas de mais de um mercado e os produtos forem vinculados.</p>}
+          {stores.length < 2 ? (
+            <p className="note">Com notas de mais de um mercado, você compara o preço de cada produto entre eles.</p>
+          ) : (
+            <a className="btn" href="#comparar">Comparar preços entre mercados</a>
+          )}
         </section>
       </div>
 

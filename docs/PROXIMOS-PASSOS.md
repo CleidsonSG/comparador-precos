@@ -13,6 +13,10 @@
    - Falta XML (item 3 da continuação) e entrada manual.
 4. Leitura ao vivo do produto (GTIN) com cartão de comparação e veredito.
 5. KPIs e gráficos, alertas e carrinho inteligente.
+   - **Feito em 2026-11-25 (item 4 de `PROMPT-CONTINUACAO.md`):** tela "Comparar mercados" (`#comparar` e `#vinculos`, `src/pages/Compare.tsx`, lógica em `src/modules/prices/compare.ts`). Usa só produtos vinculados: cesta comum por mercado, "cada produto onde é mais barato", preço por mês com uma linha por mercado (`MonthChart`) e tabela produto a produto.
+   - Sugestões de vínculo por nome parecido (Dice com abreviações, mínimo 0,6), sempre com confirmação; "Não é" fica só no aparelho (`gondola.dismissed.v1`). Vínculo à mão, tirar item, desfazer vínculo e acrescentar código de barras depois.
+   - Vínculo sem código de barras recebe um número interno de 14 dígitos começando por `29` (`isManualId`), para caber na tabela `product_links` sem mudar o banco.
+   - Limites: compara o preço unitário da nota; embalagens diferentes (1 kg x 5 kg) não são convertidas. Mais de 3 mercados repetem as 3 cores (há legenda, valores no texto e tabela).
 6. OCR: A no aparelho; B opcional com consentimento e créditos (funções no servidor).
 7. Preços colaborativos com moderação.
 8. Monitor diário do leitor e reprocessador de notas pendentes.

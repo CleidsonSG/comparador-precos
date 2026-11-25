@@ -8,6 +8,7 @@ export interface Observation {
   cnpj: string;
   date: string; // ISO
   unitPriceCents: number;
+  unit?: string; // UND, KG… (sem o dígito final da nota)
 }
 
 export interface PriceChange {
@@ -31,7 +32,7 @@ export function observations(notes: SavedNote[]): Observation[] {
       const productKey = `${n.storeCnpj}:${i.storeCode}`;
       perNote.set(productKey, {
         productKey, description: i.description, storeName: n.storeName, cnpj: n.storeCnpj,
-        date: dateOf(n), unitPriceCents: i.unitPriceCents,
+        date: dateOf(n), unitPriceCents: i.unitPriceCents, unit: i.unit,
       });
     }
     out.push(...perNote.values());

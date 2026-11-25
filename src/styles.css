@@ -166,12 +166,12 @@ ul.plain{padding-left:18px;margin:6px 0 0;display:grid;gap:6px}
 .list .it .btn,.list .it .pill{justify-self:start}
 .list .it > div:nth-child(2){grid-column:2;grid-row:1}
 
-.grid.two{grid-template-columns:1fr}
-@media(min-width:900px){.grid.two{grid-template-columns:3fr 2fr}}
+.grid.two{grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.grid.two{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}}
 .bar{height:10px;background:var(--soft);border-radius:0 4px 4px 0;overflow:hidden;margin-top:4px}
 .bar .fill{height:100%;background:var(--s1);border-radius:0 4px 4px 0;transition:width .5s}
 .readout{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;min-height:34px}
-.field select{min-height:46px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface);width:100%}
+.field select{min-width:0;min-height:46px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface);width:100%}
 .pick{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:4px 12px;margin:6px 0}
 .pick .check{margin:8px 0}
 /* Importar: próximo passo, volta da Fazenda */
@@ -205,3 +205,31 @@ ul.plain{padding-left:18px;margin:6px 0 0;display:grid;gap:6px}
 @media(min-width:520px){.modal-actions{flex-direction:row;flex-wrap:wrap;justify-content:center}.modal-actions .btn{width:auto}}
 @keyframes modal-in{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.modal-box{animation:none}}
+
+/* Comparar mercados */
+.seg{display:flex;gap:4px;padding:4px;background:var(--soft);border-radius:14px;margin:0 0 14px;max-width:420px}
+.seg a{flex:1;gap:.3em;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--ink2);font-weight:600;text-decoration:none}
+.seg a[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);outline:1px solid var(--line)}
+.legend{list-style:none;display:flex;flex-wrap:wrap;gap:6px 16px;margin:4px 0;padding:0;font-size:14px}
+.legend li,.readout .rv,.chip{display:inline-flex;align-items:center;gap:6px}
+.legend i,.readout .rv i,.chip i,.sw{display:inline-block;width:12px;height:12px;border-radius:3px;flex:none}
+.sw{margin-right:6px;vertical-align:-1px}
+.readout .rv{font-size:14px}
+.chips{border:0;padding:0;margin:0 0 14px;display:flex;flex-wrap:wrap;gap:8px}
+.chips legend{width:100%;margin-bottom:6px}
+.chip{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer}
+.chip input{width:18px;height:18px;margin:0}
+table.cmp{min-width:0}
+table.cmp td.best{color:var(--good);font-weight:700}
+table.cmp td.best svg{vertical-align:-2px;margin-left:4px}
+table.cmp .note{font-weight:400}
+.sugg{padding:12px 0;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.sugg:last-child{border:0}
+.sugg .pair{display:grid;gap:8px;grid-template-columns:1fr}
+@media(min-width:600px){.sugg .pair{grid-template-columns:1fr 1fr}}
+.sugg .pair>div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--soft)}
+ul.keys{list-style:none;padding:0;margin:0 0 10px;display:grid;gap:8px}
+ul.keys li{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+ul.keys li .btn{flex:none}
+.noteopen .field .row input{flex:1 1 180px;min-width:0}
+table.cmp td.r{white-space:nowrap}

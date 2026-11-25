@@ -5,6 +5,7 @@ import Import from "./pages/Import.tsx";
 import Scan from "./pages/Scan.tsx";
 import Cart from "./pages/Cart.tsx";
 import Settings from "./pages/Settings.tsx";
+import Compare from "./pages/Compare.tsx";
 import { IconCart, IconDoc, IconGear, IconHome, IconMoon, IconScan } from "./components/Icons.tsx";
 import { getStatus, startAutoSync, subscribe, type SyncStatus } from "./lib/sync.ts";
 import { toggleTheme } from "./lib/theme.ts";
@@ -13,16 +14,16 @@ import { loadCart } from "./lib/cart.ts";
 import ErrorBoundary from "./components/ErrorBoundary.tsx";
 import { InstallSheet, StatusBars } from "./components/Pwa.tsx";
 
-type View = "inicio" | "escanear" | "carrinho" | "importar" | "notas" | "ajustes";
+type View = "inicio" | "escanear" | "carrinho" | "importar" | "notas" | "ajustes" | "comparar" | "vinculos";
 type Nav = "inicio" | "escanear" | "carrinho" | "notas";
-const TITLES: Record<View, string> = { inicio: "Início", escanear: "Escanear produto", carrinho: "Carrinho", importar: "Importar nota", notas: "Notas fiscais", ajustes: "Configurações" };
+const TITLES: Record<View, string> = { inicio: "Início", escanear: "Escanear produto", carrinho: "Carrinho", importar: "Importar nota", notas: "Notas fiscais", ajustes: "Configurações", comparar: "Comparar mercados", vinculos: "Comparar mercados" };
 const LABELS: Record<Nav, string> = { inicio: "Início", escanear: "Escanear", carrinho: "Carrinho", notas: "Notas" };
 const ICONS: Record<Nav, ComponentType> ={ inicio: IconHome, escanear: IconScan, carrinho: IconCart, notas: IconDoc };
 
 function currentView(): View {
   const h = location.hash.slice(1).split("?")[0];
   if (h === "conta") return "ajustes"; // endereço antigo da conta
-  return h === "escanear" || h === "carrinho" || h === "importar" || h === "notas" || h === "ajustes" ? h : "inicio";
+  return h === "escanear" || h === "carrinho" || h === "importar" || h === "notas" || h === "ajustes" || h === "comparar" || h === "vinculos" ? h : "inicio";
 }
 
 const settingsLabel = (s: SyncStatus): string =>
@@ -80,7 +81,7 @@ export default function App() {
     return () => window.removeEventListener("gondola:signedin", ok);
   }, [toast]);
 
-  const active: Nav | null = view === "importar" ? "notas" : view === "ajustes" ? null : view;
+  const active: Nav | null = view === "importar" ? "notas" : view === "ajustes" ? null : view === "comparar" || view === "vinculos" ? "inicio" : view;
   const links = (["inicio", "escanear", "carrinho", "notas"] as Nav[]).map((v) => {
     const Icon = ICONS[v];
     return (
@@ -117,6 +118,7 @@ export default function App() {
           {view === "importar" && <Import toast={toast} />}
           {view === "notas" && <Notes toast={toast} />}
           {view === "ajustes" && <Settings toast={toast} />}
+          {(view === "comparar" || view === "vinculos") && <Compare key={view} tab={view} toast={toast} />}
         </div>
         </ErrorBoundary>
       </main>

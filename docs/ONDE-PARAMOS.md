@@ -1,8 +1,8 @@
-# Onde paramos (2026-11-24, pausa)
+# Onde paramos (2026-11-25)
 
 App publicado: https://cleidsonsg.github.io/comparador-precos/ (atualiza sozinho a cada push no `main`).
 Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futuras: `docs/PROXIMOS-PASSOS.md`.
-Última versão no ar: commit `60dc1ce` (nº 23). Peça "tabela de commits" para ver todos, com data, hora e como voltar atrás.
+Última versão no ar: veja o último commit do `main` (nº 25 em 25/11). Peça "tabela de commits" para ver todos, com data, hora e como voltar atrás.
 
 ## O que fizemos
 
@@ -26,26 +26,33 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
   - Faixas de sem internet e de versão nova.
   - Tela de erro.
 - **Conta:** "Conta sincronizada em …" e quanto há nela (antes dizia "Tudo guardado" mesmo sem notas).
-- **Testes:** 37 unitários (`npm test`) e 30 no navegador (`npm run test:e2e`, com o Chrome do computador).
+- **Testes:** 43 unitários (`npm test`) e 33 no navegador (`npm run test:e2e`, com o Chrome do computador).
 - **Notas de teste para comparar mercados** (`tests/fixtures/nfce-rj/`, sem CPF e sem nome): Atacadão simulada de 20/11 (14 itens) e Supermarket de 22/11 (15 itens, CNPJ e chave fictícios), com 9 produtos em comum e preços diferentes.
+
+**25/11: comparação entre mercados (item 4)**
+- Novo botão **Comparar preços entre mercados** no Início (aparece com notas de 2 ou mais mercados).
+- Aba **Vínculos**: sugestões "Parece o mesmo produto?" (nomes parecidos em mercados diferentes; nada é vinculado sem confirmar), **Vincular à mão**, **Revisar** cada vínculo, **Tirar** um item, **Desfazer vínculo** e guardar o código de barras depois.
+- Aba **Comparação**: **cesta comum** (soma dos produtos que existem em todos os mercados, com o mais barato marcado), quanto custaria comprando cada produto onde é mais barato, **preço por mês** com uma linha por mercado e tabela **produto a produto**.
+- Usa só produtos vinculados por você. Não mudou o banco.
 
 ## O que falta
 
 **Aguardando o usuário**
-- Testar no celular: Compartilhar > Gôndola, app instalado em modo avião, importar a nota simulada e depois excluí-la.
+- Testar no celular a comparação: importar as duas notas simuladas, confirmar as sugestões em Vínculos e ver a Comparação.
 - E-mail próprio (Brevo) antes do grupo de teste: libera o código de 6 dígitos e tira o limite de 2 e-mails por hora.
 - Item 2: autorizar a mudança no banco (migração `0004`) e decidir o valor por foto da leitura avançada (sugestão: "em breve").
 
 **Roteiro (`PROMPT-CONTINUACAO.md`)**
 2. Configurações: compartilhar preços, créditos e leitura avançada, apagar meus dados. Plano pronto, depende do banco.
 3. Importar o XML da nota.
-4. Comparação entre mercados só com produtos vinculados, e tela para revisar e desfazer vínculos. **Sugestão de próximo passo** (não muda o banco).
 5. Falta só o esqueleto de carregamento, quando alguma tela buscar dados na rede.
 6. Alertas de preço.
 7. Preços colaborativos com moderação.
 8. Leitura da etiqueta pela câmera (A grátis no aparelho; B paga com créditos).
 9. Consulta paga da nota (deixada para depois).
 10. Futuro: app Android de verdade, com leitura automática e gratuita da nota.
+
+**Sugestão de próximo passo:** item 3 (importar o XML da nota) ou item 6 (alertas de preço); nenhum dos dois muda o banco.
 
 **Registrado para avaliar:** trazer a nota sem copiar e colar (5 caminhos em `PROXIMOS-PASSOS.md`); notas pendentes sincronizadas na conta (exige banco).
 
@@ -65,5 +72,6 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
 5. Toque em **Abrir consulta da Fazenda**, selecione todo o texto da página e copie. Volte ao app e toque em **Colar agora**. Deve aparecer a caixa **"✓ Nota importada"**.
    - No Android, com o app instalado, dá para usar **Compartilhar > Gôndola** em vez de voltar e colar.
 6. Em **Notas**, veja itens, pendentes e **Excluir**. Em **Escanear**, teste o código de barras de um produto.
-7. Modo avião: o app instalado deve abrir com a faixa "Sem internet".
-8. Se a câmera foi bloqueada: cadeado ao lado do endereço > **Permissões** > **Câmera** > permitir.
+7. **Comparar mercados:** importe as notas simuladas do Atacadão e do Supermarket (copie o texto do arquivo e cole em Notas). No **Início**, toque em **Comparar preços entre mercados** > **Vínculos**, confirme as 9 sugestões e volte para **Comparação**.
+8. Modo avião: o app instalado deve abrir com a faixa "Sem internet".
+9. Se a câmera foi bloqueada: cadeado ao lado do endereço > **Permissões** > **Câmera** > permitir.

@@ -13,6 +13,17 @@ const KEY = "gondola.links.v1";
 
 export const isBarcode = (s: string): boolean => /^\d{8,14}$/.test(s);
 
+// Vínculo feito sem código de barras (tela de vínculos): recebe um número interno de 14 dígitos começando
+// por "29", faixa que não circula em produtos no Brasil (prefixo 789/790). Assim o banco não precisa mudar.
+export const isManualId = (s: string): boolean => /^29\d{12}$/.test(s);
+export function manualId(existing: string[]): string {
+  for (;;) {
+    const n = crypto.getRandomValues(new Uint32Array(2));
+    const id = "29" + String(n[0]! % 1e6).padStart(6, "0") + String(n[1]! % 1e6).padStart(6, "0");
+    if (!existing.includes(id)) return id;
+  }
+}
+
 export function loadLinks(): ProductLink[] {
   try {
     const raw = localStorage.getItem(KEY);
