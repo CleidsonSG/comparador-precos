@@ -10,17 +10,23 @@ import { useOnline } from "../lib/online.ts";
 import { formatDateTime, money, storeLabel } from "../lib/format.ts";
 import { parseRjConsultaText, type RjParseResult } from "../modules/nfce/uf/rj/parseConsultaText.ts";
 import { looksLikeNfceXml, parseNfceXml } from "../modules/nfce/xml/parseNfceXml.ts";
+import { looksLikeConsultaCompleta, looksLikeSavedPage, parseConsultaCompleta, RESUMIDA_MSG } from "../modules/nfce/uf/rj/parseConsultaCompleta.ts";
 
-/** Texto da consulta (colado ou do PDF) ou XML da nota. */
-const readNote = (t: string): RjParseResult => (looksLikeNfceXml(t) ? parseNfceXml(t) : parseRjConsultaText(t));
-const isXmlFile = (f: File) => /.xml$/i.test(f.name) || /xml/.test(f.type);
-const FILE_ACCEPT = "application/pdf,.pdf,.xml,text/xml,application/xml";
+/** Página da consulta completa (salva), XML da nota ou texto da consulta (colado ou do PDF). */
+const readNote = (t: string): RjParseResult =>
+  looksLikeConsultaCompleta(t) ? parseConsultaCompleta(t) : looksLikeNfceXml(t) ? parseNfceXml(t) : parseRjConsultaText(t);
+const isXmlFile = (f: File) => /\.xml$/i.test(f.name) || /xml/.test(f.type);
+/** Página salva pelo navegador: .mht/.mhtml (celular) ou .htm/.html (computador). */
+const isPageFile = async (f: File) =>
+  /\.(mht|mhtml|htm|html)$/i.test(f.name) || /html|multipart\/related|message\/rfc822|mimearchive/.test(f.type)
+  || looksLikeSavedPage(await f.slice(0, 600).text());
+const FILE_ACCEPT = "application/pdf,.pdf,.xml,text/xml,application/xml,.mht,.mhtml,.htm,.html,text/html,multipart/related,message/rfc822,application/x-mimearchive";
 
 const AWAIT_KEY = "gondola.awaiting"; // a pessoa foi à consulta da Fazenda e deve voltar com a nota
 
-interface Saved { accessKey: string; store: string; items: number; payableCents: number; issuedAt: string | null; validated: boolean }
+interface Saved { accessKey: string; store: string; items: number; payableCents: number; issuedAt: string | null; validated: boolean; withGtin: number | null }
 /** nota lida que já estava guardada */
-interface Dup extends Saved { savedAt: string; result: RjParseResult }
+interface Dup extends Omit<Saved, "withGtin"> { savedAt: string; result: RjParseResult }
 
 const scrollTo = (id: string) => window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
 
@@ -77,7 +83,8 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
       try { sessionStorage.removeItem(AWAIT_KEY); } catch { /* ignora */ }
       setBack(false);
       setDup(null);
-      setSaved({ accessKey: k, store: storeLabel(r.store.name), items: r.items.length, payableCents: r.totals.payableCents ?? 0, issuedAt: r.note.issuedAt, validated: r.validated });
+      const withGtin = r.items.some((i) => i.gtin !== undefined) ? r.items.filter((i) => i.gtin).length : null;
+      setSaved({ accessKey: k, store: storeLabel(r.store.name), items: r.items.length, payableCents: r.totals.payableCents ?? 0, issuedAt: r.note.issuedAt, validated: r.validated, withGtin });
     } catch (e) { setErr(e instanceof Error ? e.message : "Erro ao guardar."); }
   }, []);
 
@@ -116,13 +123,24 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     }
   };
 
-  /** PDF da consulta ou XML da nota (o XML não vai para o campo de texto: é grande e traz o bloco do consumidor). */
+  /**
+   * Página da consulta completa salva, PDF da consulta ou XML da nota.
+   * A página e o XML não vão para o campo de texto: são grandes e trazem o bloco do consumidor.
+   */
   const onFile = async (f: File | undefined) => {
     if (!f) return;
     setBusy(true); setErr(""); setBack(false);
     const xml = isXmlFile(f);
+    let page = false;
     try {
-      if (xml) {
+      page = !xml && await isPageFile(f);
+      if (page) {
+        if (f.size > 10_000_000) throw new Error("grande");
+        const t = await f.text();
+        setText("");
+        if (!looksLikeConsultaCompleta(t)) { setResult(null); setErr(RESUMIDA_MSG); return; }
+        parse(t);
+      } else if (xml) {
         if (f.size > 5_000_000) throw new Error("grande");
         const t = await f.text();
         setText("");
@@ -134,7 +152,9 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
         setText(t); parse(t);
       }
     } catch {
-      setErr(xml ? "Não consegui ler este XML. Use o arquivo XML da nota, sem compactar." : "Não consegui ler este PDF. Use o PDF salvo da consulta oficial ou cole o texto da página.");
+      setErr(page ? "Não consegui ler esta página. Na consulta da Fazenda, toque em Consulta completa e baixe de novo pelos 3 pontinhos (⋮)."
+        : xml ? "Não consegui ler este XML. Use o arquivo XML da nota, sem compactar."
+        : "Não consegui ler este arquivo. Use a página baixada da Consulta completa, o PDF salvo da consulta ou cole o texto da página.");
     } finally { setBusy(false); }
   };
 
@@ -207,13 +227,13 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
       {back && !saved && !dup && (
         <section className="card back" aria-labelledby="voltou">
           <h2 id="voltou">Trouxe a nota da Fazenda?</h2>
-          <p className="sub">Na página da nota, selecione todo o texto e copie. Depois toque em <b>Colar agora</b>. A nota é conferida e guardada sozinha.</p>
+          <p className="sub">Baixou a <b>Consulta completa</b>? Toque em <b>Escolher arquivo baixado</b>: vem com o código de barras dos produtos. Se copiou o texto da página, toque em <b>Colar agora</b>. A nota é conferida e guardada sozinha.</p>
           <div className="row">
-            <button className="btn tag" onClick={() => void paste()}>Colar agora</button>
-            <label className="btn">
-              Enviar PDF ou XML
+            <label className="btn tag">
+              Escolher arquivo baixado
               <input type="file" accept={FILE_ACCEPT} className="sr" onChange={(e) => { void onFile(e.target.files?.[0]); e.target.value = ""; }} />
             </label>
+            <button className="btn" onClick={() => void paste()}>Colar agora</button>
             <button className="btn" onClick={() => setBack(false)}>Agora não</button>
           </div>
         </section>
@@ -223,6 +243,7 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
         open={!!saved}
         badge="✓"
         title="Nota importada"
+        dismissible={false}
         onClose={finish}
         actions={<>
           <button className="btn primary" autoFocus onClick={finish}>OK</button>
@@ -235,6 +256,7 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
             <b>{saved.store}</b>, {formatDateTime(saved.issuedAt)}.<br />
             {saved.items} {saved.items === 1 ? "item" : "itens"}, {money(saved.payableCents)} pagos.
             {saved.validated ? " A soma dos itens conferiu com o total." : ""}
+            {saved.withGtin !== null && <><br />{saved.withGtin} de {saved.items} com código de barras.</>}
           </p>
         )}
       </Modal>
@@ -244,6 +266,7 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
         badge="i"
         tone="info"
         title="Esta nota já estava importada"
+        dismissible={false}
         onClose={finish}
         actions={<>
           <button className="btn primary" autoFocus onClick={finish}>OK</button>
@@ -285,9 +308,14 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
           <div>
             <h2>Abra a consulta oficial</h2>
             {nextStep && <p className="nexthint" role="status">Próximo passo: toque em <b>Abrir consulta da Fazenda</b>.</p>}
-            <p className="sub">
-              A nota abre no seu navegador. Lá, selecione todo o texto e copie, e volte ao app: ele oferece colar.
-              No Android, com o app instalado, você também pode tocar em <b>Compartilhar</b> e escolher <b>Gôndola</b>.
+            <p className="sub">A nota abre no seu navegador. O melhor jeito, que traz o código de barras dos produtos:</p>
+            <ol className="sub steps-mini">
+              <li>Na página da Fazenda, toque em <b>Consulta completa</b>.</li>
+              <li>Quando aparecerem as abas (Emitente, Produtos…), toque nos <b>3 pontinhos ⋮</b> e na <b>seta de download ⬇</b>.</li>
+              <li>Volte ao app e toque em <b>Escolher arquivo baixado</b>.</li>
+            </ol>
+            <p className="note" style={{ margin: "4px 0 10px" }}>
+              Também vale copiar todo o texto da página e colar no app. No Android, com o app instalado, dá para tocar em <b>Compartilhar</b> e escolher <b>Gôndola</b>.
             </p>
             <div className="row">
               <a role="link" className={`btn primary${key && online ? "" : " off"}`} href={key && online ? officialConsultaUrl(qrText) : undefined} target="_blank" rel="noopener noreferrer" aria-disabled={!key || !online} onClick={openConsulta}>Abrir consulta da Fazenda</a>
@@ -303,13 +331,13 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
           <div className="n" aria-hidden="true">3</div>
           <div>
             <h2>Traga a nota de volta</h2>
-            <p className="sub">Cole o texto da página ou envie o PDF salvo dela ou o XML da nota. Se a soma dos itens conferir, a nota é guardada sozinha. Já tem o PDF, o XML ou o texto? Pode usar direto, sem os passos 1 e 2: a chave vem junto. O CPF e o nome do consumidor são ignorados e não ficam guardados.</p>
+            <p className="sub">Envie a página baixada da Consulta completa, o PDF salvo da consulta ou o XML da nota, ou cole o texto da página. Se a soma dos itens conferir, a nota é guardada sozinha. Já tem o arquivo ou o texto? Pode usar direto, sem os passos 1 e 2: a chave vem junto. O CPF e o nome do consumidor são apagados antes da leitura e não ficam guardados.</p>
             <div className="row">
-              <button className="btn tag" onClick={() => void paste()}>Colar da área de transferência</button>
-              <label className="btn">
-                Enviar PDF ou XML
+              <label className="btn tag">
+                Escolher arquivo baixado
                 <input type="file" accept={FILE_ACCEPT} className="sr" onChange={(e) => { void onFile(e.target.files?.[0]); e.target.value = ""; }} />
               </label>
+              <button className="btn" onClick={() => void paste()}>Colar da área de transferência</button>
             </div>
             <div className="field">
               <label htmlFor="texto">Ou cole o texto aqui</label>

@@ -40,6 +40,13 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
 - O bloco do consumidor (CPF e nome) é apagado antes da leitura. A nota é conferida (chave, CNPJ e soma) e guardada sozinha.
 - Limite: XML com código de produto com letras é recusado com aviso (o servidor só aceita números).
 
+**25/11: consulta completa com código de barras**
+- Na Fazenda, o XML exige certificado digital, mas a **Consulta completa** baixada no celular (⋮ > ⬇, arquivo **.mht**) traz o **código de barras (GTIN)** de cada item. Ver `docs/RJ-ACESSO.md`.
+- Em **Importar**, o botão principal agora é **Escolher arquivo baixado** (aceita .mht, .html, PDF e XML), e o passo 2 mostra o roteiro: Consulta completa > ⋮ > ⬇.
+- Destinatário (CPF), pagamento e informações adicionais são apagados antes da leitura. A caixa "Nota importada" mostra quantos itens vieram com código de barras.
+- Página da consulta resumida é recusada com o pedido de tocar em Consulta completa.
+- O GTIN fica guardado no aparelho. Ainda **não** vai para o servidor nem sugere vínculos (próximo passo, item 4b).
+
 ## O que falta
 
 **Aguardando o usuário**
@@ -56,7 +63,9 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
 9. Consulta paga da nota (deixada para depois).
 10. Futuro: app Android de verdade, com leitura automática e gratuita da nota.
 
-**Sugestão de próximo passo:** item 6 (alertas de preço), não muda o banco.
+**Sugestão de próximo passo:** item 4b, sugerir vínculo entre mercados pelo código de barras (sempre com confirmação); depois, item 6 (alertas de preço).
+
+**Aguardando teste no celular:** importar uma nota pela Consulta completa (.mht) e ver se o seletor de arquivos do Android mostra o arquivo baixado.
 
 **Registrado para avaliar:** trazer a nota sem copiar e colar (5 caminhos em `PROXIMOS-PASSOS.md`); notas pendentes sincronizadas na conta (exige banco).
 

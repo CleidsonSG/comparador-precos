@@ -12,6 +12,8 @@ export interface RjItem {
   unitRaw: string;         // como veio na página (ex.: UND9); o dígito final ainda não é entendido
   unitPriceCents: number;
   totalCents: number;
+  /** código de barras: só a "Consulta completa" traz; null = "SEM GTIN" (a granel) */
+  gtin?: string | null;
 }
 
 export interface RjParseResult {

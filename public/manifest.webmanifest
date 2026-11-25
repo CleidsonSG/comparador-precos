@@ -30,7 +30,7 @@
       "title": "title",
       "text": "text",
       "url": "url",
-      "files": [{ "name": "nota", "accept": ["application/pdf", ".pdf", "text/xml", "application/xml", ".xml"] }]
+      "files": [{ "name": "nota", "accept": ["application/pdf", ".pdf", "text/xml", "application/xml", ".xml", "multipart/related", "message/rfc822", "application/x-mimearchive", ".mht", ".mhtml", "text/html", ".html", ".htm"] }]
     }
   }
 }

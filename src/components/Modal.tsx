@@ -12,12 +12,16 @@ interface Props {
   actions: ReactNode;
   /** Esc ou toque fora da caixa */
   onClose: () => void;
+  /** false: só fecha pelos botões (ignora toque fora, Esc e o "voltar" do Android) */
+  dismissible?: boolean;
 }
 
 /** Caixa suspensa (diálogo modal nativo): foco preso nela, Esc fecha, fundo escurecido. */
-export default function Modal({ open, title, badge, tone = "good", children, actions, onClose }: Props) {
+export default function Modal({ open, title, badge, tone = "good", children, actions, onClose, dismissible = true }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const id = useId();
+  const openRef = useRef(open);
+  openRef.current = open;
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
@@ -29,8 +33,14 @@ export default function Modal({ open, title, badge, tone = "good", children, act
       ref={ref}
       className="modal"
       aria-labelledby={`${id}-t`}
-      onCancel={(e) => { e.preventDefault(); onClose(); }}
-      onClick={(e) => { if (e.target === ref.current) onClose(); }}
+      onCancel={(e) => { e.preventDefault(); if (dismissible) onClose(); }}
+      onClick={(e) => { if (dismissible && e.target === ref.current) onClose(); }}
+      onClose={() => {
+        // o navegador pode fechar a caixa sozinho (ex.: "voltar" repetido no Android): reabre ou avisa quem controla
+        if (!openRef.current) return;
+        if (dismissible) onClose();
+        else ref.current?.showModal();
+      }}
     >
       {open && (
         <div className="modal-box">
