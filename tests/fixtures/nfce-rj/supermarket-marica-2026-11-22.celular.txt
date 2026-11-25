@@ -1,0 +1,73 @@
+NFC-e
+DOCUMENTO AUXILIAR DA NOTA FISCAL DE CONSUMIDOR ELETRÔNICA
+
+SUPERMARKET TESTE LTDA
+CNPJ: 48.273.615/0001-18
+AV ROBERTO SILVEIRA , 500 , , CENTRO , MARICA , RJ
+Filtrar itens...
+CHARQUE JERKED BEEF DT 500G (Código: 100245 )
+Qtde.:1  UN: UND9  Vl. Unit.:   54,99 	Vl. Total
+54,99
+ARROZ T1 OURO B.AGULHA 5KG (Código: 100318 )
+Qtde.:2  UN: UND9  Vl. Unit.:   21,49 	Vl. Total
+42,98
+CAFE MELITTA TRAD 500G (Código: 100422 )
+Qtde.:1  UN: UND9  Vl. Unit.:   22,98 	Vl. Total
+22,98
+FEIJAO PRETO COMBRASIL 1KG (Código: 100517 )
+Qtde.:2  UN: UND9  Vl. Unit.:   8,79 	Vl. Total
+17,58
+ACUCAR REF UNIAO 1KG (Código: 100603 )
+Qtde.:2  UN: UND9  Vl. Unit.:   4,99 	Vl. Total
+9,98
+LEITE PO NINHO INTEGRAL 380G (Código: 100771 )
+Qtde.:1  UN: UND9  Vl. Unit.:   52,9 	Vl. Total
+52,90
+OLEO SOJA LIZA 900ML (Código: 100829 )
+Qtde.:3  UN: UND9  Vl. Unit.:   7,49 	Vl. Total
+22,47
+AZEITE EV GALLO VD 500ML (Código: 100936 )
+Qtde.:1  UN: VDO9  Vl. Unit.:   32,9 	Vl. Total
+32,90
+PAPEL HIG PERSONAL VIP 12UN (Código: 101044 )
+Qtde.:1  UN: UND9  Vl. Unit.:   25,49 	Vl. Total
+25,49
+BANANA PRATA KG (Código: 2081 )
+Qtde.:1,262  UN: KG9  Vl. Unit.:   6,98 	Vl. Total
+8,81
+OVOS BRANCOS GRANDES 30UN (Código: 101152 )
+Qtde.:1  UN: UND9  Vl. Unit.:   24,99 	Vl. Total
+24,99
+REFRIG COCA COLA 2L (Código: 101267 )
+Qtde.:2  UN: UND9  Vl. Unit.:   10,99 	Vl. Total
+21,98
+BISC CREAM CRACKER VITARELLA (Código: 101375 )
+Qtde.:3  UN: PCT9  Vl. Unit.:   4,29 	Vl. Total
+12,87
+MANTEIGA AVIACAO 200G (Código: 101483 )
+Qtde.:1  UN: UND9  Vl. Unit.:   16,9 	Vl. Total
+16,90
+QUEIJO MUSSARELA FATIADO KG (Código: 2194 )
+Qtde.:0,388  UN: KG9  Vl. Unit.:   49,9 	Vl. Total
+19,36
+Qtd. total de itens:15
+Valor total R$:387,18
+Descontos R$:3,00
+Valor a pagar R$:384,18
+Forma de pagamento:Valor pago R$:
+Cartão de Crédito384,18
+Informação dos Tributos Totais Incidentes (Lei Federal 12.741/2012) R$
+110,81
+EMISSÃO NORMAL
+
+Número: 45218 Série: 2 Emissão: 22/11/2026 10:15:33-03:00 - Via Consumidor 2
+
+Protocolo de Autorização: 233262719004417 22/11/2026 às 10:15:41-03:00
+
+Ambiente de Produção - Versão XML: 4.00 - Versão XSLT: 2.07
+Consulte pela Chave de Acesso em https://www.fazenda.rj.gov.br/nfce/consulta
+
+Chave de acesso:
+3326 1148 2736 1500 0118 6500 2000 0452 1818 3920 4714
+Consumidor não identificado
+PDV : 7 - TRANSACAO : 20934

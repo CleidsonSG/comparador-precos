@@ -1,0 +1,70 @@
+NFC-e
+DOCUMENTO AUXILIAR DA NOTA FISCAL DE CONSUMIDOR ELETRÔNICA
+
+ATACADAO S.A.
+CNPJ: 75.315.333/0319-26
+ROD ERNANI DO AMARAL PEIXOTO S/N , 1 , , FLAMENGO , MARICA , RJ
+Filtrar itens...
+JERKED BEEF DT (Código: 84331 )
+Qtde.:1  UN: UND9  Vl. Unit.:   57,9 	Vl. Total
+57,90
+ARROZ OURO B.AGUL. (Código: 69203 )
+Qtde.:2  UN: UND9  Vl. Unit.:   19,9 	Vl. Total
+39,80
+CAFE MELITTA (Código: 49829 )
+Qtde.:1  UN: UND9  Vl. Unit.:   24,5 	Vl. Total
+24,50
+FEIJAO COMBRASIL (Código: 69657 )
+Qtde.:2  UN: UND9  Vl. Unit.:   9,49 	Vl. Total
+18,98
+BACON DEF.PAMPLONA (Código: 3985 )
+Qtde.:0,87  UN: KG9  Vl. Unit.:   41,9 	Vl. Total
+36,45
+LEITE PO NINHO INT. (Código: 95627 )
+Qtde.:1  UN: UND9  Vl. Unit.:   49,9 	Vl. Total
+49,90
+AZEITE GALLO VDO (Código: 7081 )
+Qtde.:1  UN: VDO9  Vl. Unit.:   29,9 	Vl. Total
+29,90
+SAB.PROTEX (Código: 61018 )
+Qtde.:6  UN: UND9  Vl. Unit.:   3,49 	Vl. Total
+20,94
+PAPEL HIG.PERSONAL (Código: 76907 )
+Qtde.:1  UN: UND9  Vl. Unit.:   27,9 	Vl. Total
+27,90
+OVOS BRANCOS GR 30UN (Código: 40211 )
+Qtde.:1  UN: UND9  Vl. Unit.:   22,9 	Vl. Total
+22,90
+MAC.PARAFUSO DONA BENTA (Código: 33018 )
+Qtde.:3  UN: PCT9  Vl. Unit.:   4,79 	Vl. Total
+14,37
+TOMATE ITALIANO (Código: 1945 )
+Qtde.:1,135  UN: KG9  Vl. Unit.:   8,99 	Vl. Total
+10,20
+DET.LIQ.LIMPOL (Código: 22870 )
+Qtde.:4  UN: UND9  Vl. Unit.:   2,69 	Vl. Total
+10,76
+QUEIJO MUSSARELA (Código: 18833 )
+Qtde.:0,412  UN: KG9  Vl. Unit.:   44,9 	Vl. Total
+18,50
+Qtd. total de itens:14
+Valor total R$:383,00
+Descontos R$:5,00
+Valor a pagar R$:378,00
+Forma de pagamento:Valor pago R$:
+Cartão de Débito378,00
+Informação dos Tributos Totais Incidentes (Lei Federal 12.741/2012) R$
+109,62
+EMISSÃO NORMAL
+
+Número: 131877 Série: 506 Emissão: 20/11/2026 18:42:10-03:00 - Via Consumidor 2
+
+Protocolo de Autorização: 233262718355190 20/11/2026 às 18:42:19-03:00
+
+Ambiente de Produção - Versão XML: 4.00 - Versão XSLT: 2.07
+Consulte pela Chave de Acesso em https://www.fazenda.rj.gov.br/nfce/consulta
+
+Chave de acesso:
+3326 1175 3153 3303 1926 6550 6000 1318 7714 0726 3154
+Consumidor não identificado
+PDV : 4 - TRANSACAO : 71233

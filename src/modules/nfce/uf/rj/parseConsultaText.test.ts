@@ -64,3 +64,25 @@ test("texto sem nota retorna erro, não exceção", () => {
   assert.equal(r.ok, false);
   assert.ok(r.errors.length > 0);
 });
+
+// Nota sintética de outro mercado (CNPJ e chave fictícios, DV válidos): 9 produtos em comum com a nota simulada do Atacadão, com preços diferentes
+test("lê a nota sintética do Supermarket (celular)", () => {
+  const r = parseRjConsultaText(load("supermarket-marica-2026-11-22.celular.txt"));
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.validated, true);
+  assert.equal(r.items.length, 15);
+  assert.equal(r.totals.totalCents, 38718);
+  assert.equal(r.totals.payableCents, 38418);
+  assert.equal(r.store?.cnpj, "48273615000118");
+  assert.equal(r.note?.accessKey, "33261148273615000118650020000452181839204714");
+});
+
+// Nota simulada do Atacadão (20/11): 14 itens, mesmos códigos da nota real, preços diferentes
+test("lê a nota simulada do Atacadão (celular)", () => {
+  const r = parseRjConsultaText(load("atacadao-marica-2026-11-20.simulada.celular.txt"));
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.validated, true);
+  assert.equal(r.items.length, 14);
+  assert.equal(r.totals.totalCents, 38300);
+  assert.equal(r.store?.cnpj, "75315333031926");
+});
