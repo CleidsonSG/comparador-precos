@@ -10,6 +10,7 @@ Web app (PWA) que importa NFC-e, guarda preços e compara com a próxima compra,
 - **Vínculo de produto por mercado (CNPJ) + código interno da nota.** O GTIN é opcional; vínculo assistido entre código de barras e item, sempre com confirmação do usuário.
 - **Validação no servidor** (funções do Supabase) para consentimento, saldo e limites antes de qualquer chamada paga.
 - **Sem automações que alterem produção sozinhas.** Reparo do leitor: o agente propõe, o humano aprova.
+- **Commit e push só com autorização do usuário, a cada vez.** Antes, mostrar o que mudou e a mensagem proposta e perguntar. Cada push publica o app (GitHub Pages). Vale também para revert.
 - Publicação nas lojas (Play Store/App Store) está **fora do escopo** até o usuário pedir.
 
 ## Visual e frontend

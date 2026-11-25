@@ -9,6 +9,12 @@ import { takeShared } from "../lib/shared.ts";
 import { useOnline } from "../lib/online.ts";
 import { formatDateTime, money, storeLabel } from "../lib/format.ts";
 import { parseRjConsultaText, type RjParseResult } from "../modules/nfce/uf/rj/parseConsultaText.ts";
+import { looksLikeNfceXml, parseNfceXml } from "../modules/nfce/xml/parseNfceXml.ts";
+
+/** Texto da consulta (colado ou do PDF) ou XML da nota. */
+const readNote = (t: string): RjParseResult => (looksLikeNfceXml(t) ? parseNfceXml(t) : parseRjConsultaText(t));
+const isXmlFile = (f: File) => /.xml$/i.test(f.name) || /xml/.test(f.type);
+const FILE_ACCEPT = "application/pdf,.pdf,.xml,text/xml,application/xml";
 
 const AWAIT_KEY = "gondola.awaiting"; // a pessoa foi à consulta da Fazenda e deve voltar com a nota
 
@@ -78,7 +84,7 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
   /** Lê o texto da consulta. Se a soma confere e a nota é nova, guarda sozinho (com "Desfazer"). */
   const parse = useCallback((t: string) => {
     setErr(""); setSaved(null); setDup(null);
-    const r = parseRjConsultaText(t);
+    const r = readNote(t);
     const cur = keyRef.current;
     const fromText = r.note?.accessKey?.replace(/\D/g, "") || "";
     if (fromText && cur && fromText !== cur) {
@@ -110,15 +116,25 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     }
   };
 
-  const onPdf = async (f: File | undefined) => {
+  /** PDF da consulta ou XML da nota (o XML não vai para o campo de texto: é grande e traz o bloco do consumidor). */
+  const onFile = async (f: File | undefined) => {
     if (!f) return;
     setBusy(true); setErr(""); setBack(false);
+    const xml = isXmlFile(f);
     try {
-      const { pdfToText } = await import("../lib/pdfText.ts");
-      const t = await pdfToText(f);
-      setText(t); parse(t);
+      if (xml) {
+        if (f.size > 5_000_000) throw new Error("grande");
+        const t = await f.text();
+        setText("");
+        if (!looksLikeNfceXml(t)) { setResult(null); setErr("Este arquivo não é o XML de uma nota fiscal (NFC-e)."); return; }
+        parse(t);
+      } else {
+        const { pdfToText } = await import("../lib/pdfText.ts");
+        const t = await pdfToText(f);
+        setText(t); parse(t);
+      }
     } catch {
-      setErr("Não consegui ler este PDF. Use o PDF salvo da consulta oficial ou cole o texto da página.");
+      setErr(xml ? "Não consegui ler este XML. Use o arquivo XML da nota, sem compactar." : "Não consegui ler este PDF. Use o PDF salvo da consulta oficial ou cole o texto da página.");
     } finally { setBusy(false); }
   };
 
@@ -132,10 +148,10 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
     if (params.has("compartilhado")) {
       void takeShared().then(async (s) => {
         if (!s) return;
-        if (s.file) await onPdf(s.file);
+        if (s.file) await onFile(s.file);
         else if (s.text) {
           // texto da página (selecionar tudo > Compartilhar) ou só o link da nota (Compartilhar a página)
-          if (parseRjConsultaText(s.text).ok) { setText(s.text); parse(s.text); }
+          if (readNote(s.text).ok) { setText(s.text); parse(s.text); }
           else acceptInput(s.text);
         }
       });
@@ -195,8 +211,8 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
           <div className="row">
             <button className="btn tag" onClick={() => void paste()}>Colar agora</button>
             <label className="btn">
-              Enviar PDF
-              <input type="file" accept="application/pdf" className="sr" onChange={(e) => { void onPdf(e.target.files?.[0]); e.target.value = ""; }} />
+              Enviar PDF ou XML
+              <input type="file" accept={FILE_ACCEPT} className="sr" onChange={(e) => { void onFile(e.target.files?.[0]); e.target.value = ""; }} />
             </label>
             <button className="btn" onClick={() => setBack(false)}>Agora não</button>
           </div>
@@ -287,12 +303,12 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
           <div className="n" aria-hidden="true">3</div>
           <div>
             <h2>Traga a nota de volta</h2>
-            <p className="sub">Cole o texto da página ou envie o PDF salvo dela. Se a soma dos itens conferir, a nota é guardada sozinha. Já tem o PDF ou o texto? Pode usar direto, sem os passos 1 e 2: a chave vem junto. O CPF e o nome do consumidor são ignorados e não ficam guardados.</p>
+            <p className="sub">Cole o texto da página ou envie o PDF salvo dela ou o XML da nota. Se a soma dos itens conferir, a nota é guardada sozinha. Já tem o PDF, o XML ou o texto? Pode usar direto, sem os passos 1 e 2: a chave vem junto. O CPF e o nome do consumidor são ignorados e não ficam guardados.</p>
             <div className="row">
               <button className="btn tag" onClick={() => void paste()}>Colar da área de transferência</button>
               <label className="btn">
-                Enviar PDF
-                <input type="file" accept="application/pdf" className="sr" onChange={(e) => { void onPdf(e.target.files?.[0]); e.target.value = ""; }} />
+                Enviar PDF ou XML
+                <input type="file" accept={FILE_ACCEPT} className="sr" onChange={(e) => { void onFile(e.target.files?.[0]); e.target.value = ""; }} />
               </label>
             </div>
             <div className="field">
@@ -300,7 +316,7 @@ export default function Import({ toast }: { toast: (t: string) => void }) {
               <textarea id="texto" value={text} onChange={(e) => setText(e.target.value)} placeholder="Texto da consulta…" />
             </div>
             <button className="btn" disabled={!text.trim()} onClick={() => parse(text)}>Ler texto</button>
-            {busy && <div className="msg info" role="status" aria-busy="true">Lendo o PDF…</div>}
+            {busy && <div className="msg info" role="status" aria-busy="true">Lendo o arquivo…</div>}
             {err && <div className="msg bad" role="alert">{err}</div>}
           </div>
         </div>

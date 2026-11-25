@@ -10,7 +10,9 @@
    - Banco: migração `0003_sync.sql` aplicada (colunas da nota, `product_links`, `cart_items`, perfil criado no primeiro login, `save_receipt` só para o servidor).
    - Função `save-receipt` publicada: confere o usuário, valida a nota (chave, CNPJ, soma, nenhum CPF) e grava de forma atômica.
    - **Pendente (usuário):** no painel do Supabase, em Authentication > Email Templates, incluir `{{ .Token }}` nos modelos "Magic Link" e "Confirm signup" para o e-mail trazer o código de 6 dígitos. Configurar um serviço de e-mail próprio (SMTP) antes do grupo de teste: o padrão envia poucos e-mails por hora.
-   - Falta XML (item 3 da continuação) e entrada manual.
+   - **XML feito em 2026-11-25 (item 3):** `src/modules/nfce/xml/parseNfceXml.ts` (layout nacional 4.00, qualquer UF, só modelo 65). Apaga `<dest>`, `<infAdic>`, `<autXML>` e a assinatura antes de ler: CPF e nome nunca são lidos. Confere chave (DV), CNPJ da chave e soma dos itens com `ICMSTot/vProd`. Entra por "Enviar PDF ou XML", texto colado ou Compartilhar > Gôndola.
+   - Limite do XML: código de produto com letras (`cProd`) é recusado, porque a função `save-receipt` só aceita código numérico. Ampliar exige mudar e publicar a função (pedir autorização). O GTIN (`cEAN`) ainda não é guardado; poderia sugerir vínculos pelo código de barras (sempre com confirmação).
+   - Falta entrada manual.
 4. Leitura ao vivo do produto (GTIN) com cartão de comparação e veredito.
 5. KPIs e gráficos, alertas e carrinho inteligente.
    - **Feito em 2026-11-25 (item 4 de `PROMPT-CONTINUACAO.md`):** tela "Comparar mercados" (`#comparar` e `#vinculos`, `src/pages/Compare.tsx`, lógica em `src/modules/prices/compare.ts`). Usa só produtos vinculados: cesta comum por mercado, "cada produto onde é mais barato", preço por mês com uma linha por mercado (`MonthChart`) e tabela produto a produto.

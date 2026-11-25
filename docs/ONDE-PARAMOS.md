@@ -2,7 +2,7 @@
 
 App publicado: https://cleidsonsg.github.io/comparador-precos/ (atualiza sozinho a cada push no `main`).
 Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futuras: `docs/PROXIMOS-PASSOS.md`.
-Última versão no ar: veja o último commit do `main` (nº 25 em 25/11). Peça "tabela de commits" para ver todos, com data, hora e como voltar atrás.
+Última versão no ar: veja o último commit do `main`. Commit e push só com autorização do usuário. Peça "tabela de commits" para ver todos, com data, hora e como voltar atrás.
 
 ## O que fizemos
 
@@ -26,7 +26,7 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
   - Faixas de sem internet e de versão nova.
   - Tela de erro.
 - **Conta:** "Conta sincronizada em …" e quanto há nela (antes dizia "Tudo guardado" mesmo sem notas).
-- **Testes:** 43 unitários (`npm test`) e 33 no navegador (`npm run test:e2e`, com o Chrome do computador).
+- **Testes:** 50 unitários (`npm test`) e 36 no navegador (`npm run test:e2e`, com o Chrome do computador).
 - **Notas de teste para comparar mercados** (`tests/fixtures/nfce-rj/`, sem CPF e sem nome): Atacadão simulada de 20/11 (14 itens) e Supermarket de 22/11 (15 itens, CNPJ e chave fictícios), com 9 produtos em comum e preços diferentes.
 
 **25/11: comparação entre mercados (item 4)**
@@ -34,6 +34,11 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
 - Aba **Vínculos**: sugestões "Parece o mesmo produto?" (nomes parecidos em mercados diferentes; nada é vinculado sem confirmar), **Vincular à mão**, **Revisar** cada vínculo, **Tirar** um item, **Desfazer vínculo** e guardar o código de barras depois.
 - Aba **Comparação**: **cesta comum** (soma dos produtos que existem em todos os mercados, com o mais barato marcado), quanto custaria comprando cada produto onde é mais barato, **preço por mês** com uma linha por mercado e tabela **produto a produto**.
 - Usa só produtos vinculados por você. Não mudou o banco.
+
+**25/11: importar o XML da nota (item 3)**
+- Em **Importar**, o botão virou **Enviar PDF ou XML**. O XML também pode ser colado no campo de texto ou compartilhado com o Gôndola no Android.
+- O bloco do consumidor (CPF e nome) é apagado antes da leitura. A nota é conferida (chave, CNPJ e soma) e guardada sozinha.
+- Limite: XML com código de produto com letras é recusado com aviso (o servidor só aceita números).
 
 ## O que falta
 
@@ -44,7 +49,6 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
 
 **Roteiro (`PROMPT-CONTINUACAO.md`)**
 2. Configurações: compartilhar preços, créditos e leitura avançada, apagar meus dados. Plano pronto, depende do banco.
-3. Importar o XML da nota.
 5. Falta só o esqueleto de carregamento, quando alguma tela buscar dados na rede.
 6. Alertas de preço.
 7. Preços colaborativos com moderação.
@@ -52,7 +56,7 @@ Roteiro completo: `docs/PROMPT-CONTINUACAO.md`. Detalhes técnicos e ideias futu
 9. Consulta paga da nota (deixada para depois).
 10. Futuro: app Android de verdade, com leitura automática e gratuita da nota.
 
-**Sugestão de próximo passo:** item 3 (importar o XML da nota) ou item 6 (alertas de preço); nenhum dos dois muda o banco.
+**Sugestão de próximo passo:** item 6 (alertas de preço), não muda o banco.
 
 **Registrado para avaliar:** trazer a nota sem copiar e colar (5 caminhos em `PROXIMOS-PASSOS.md`); notas pendentes sincronizadas na conta (exige banco).
 
